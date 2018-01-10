@@ -182,10 +182,19 @@ def SnippetGen(text, start_tok, end_tok, inclusive=True):
 
   Yields:
     String snippets
+
+  [後續更正]
   """
   cur = 0
   while True:
     try:
+      # print('text的型態', type(text))
+      # print('start_tok的型態', type(start_tok))
+      # print('end_tok的型態', type(end_tok))
+
+      # print(type(text))
+      if type(text) is bytes:
+        text = text.decode('utf-8')
       start_p = text.index(start_tok, cur)
       end_p = text.index(end_tok, start_p + 1)
       cur = end_p + len(end_tok)
