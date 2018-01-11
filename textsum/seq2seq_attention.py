@@ -30,6 +30,11 @@ import data
 import seq2seq_attention_decode
 import seq2seq_attention_model
 
+# 執行過程redirect到log.txt
+wf = open('running_log.txt', 'w')
+sys.stdout = wf
+
+
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('data_path',
                            '', 'Path expression to tf.Example.')
@@ -44,7 +49,7 @@ tf.app.flags.DEFINE_string('train_dir', '', 'Directory for train.')
 tf.app.flags.DEFINE_string('eval_dir', '', 'Directory for eval.')
 tf.app.flags.DEFINE_string('decode_dir', '', 'Directory for decode summaries.')
 tf.app.flags.DEFINE_string('mode', 'train', 'train/eval/decode mode')
-tf.app.flags.DEFINE_integer('max_run_steps', 10000000,
+tf.app.flags.DEFINE_integer('max_run_steps', 1000000,
                             'Maximum number of run steps.')
 tf.app.flags.DEFINE_integer('max_article_sentences', 2,
                             'Max number of first sentences to use from the '
@@ -61,7 +66,7 @@ tf.app.flags.DEFINE_bool('use_bucketing', False,
 tf.app.flags.DEFINE_bool('truncate_input', False,
                          'Truncate inputs that are too long. If False, '
                          'examples that are too long are discarded.')
-tf.app.flags.DEFINE_integer('num_gpus', 1, 'Number of gpus used.')
+tf.app.flags.DEFINE_integer('num_gpus', 2, 'Number of gpus used.')
 tf.app.flags.DEFINE_integer('random_seed', 111, 'A seed value for randomness.')
 
 
@@ -75,7 +80,7 @@ def _RunningAvgLoss(loss, running_avg_loss, summary_writer, step, decay=0.999):
   loss_sum = tf.Summary()
   loss_sum.value.add(tag='running_avg_loss', simple_value=running_avg_loss)
   summary_writer.add_summary(loss_sum, step)
-  sys.stdout.write('running_avg_loss: %f\n' % running_avg_loss)
+  print('running_avg_loss: %f\n' % running_avg_loss, flush=True)
   return running_avg_loss
 
 
@@ -210,4 +215,11 @@ def main(unused_argv):
 
 
 if __name__ == '__main__':
+  from time import time
+  start = time()
+  
   tf.app.run()
+  
+  end = time()
+  wf.close()
+  print('執行共花費', (end - start), '秒')
