@@ -4,7 +4,6 @@ bazel-genfiles
 bazel-out
 bazel-testlogs
 bazel-textsum_demo
-data/
 nohup.out
 venv_*
 textsum/bazel-*
