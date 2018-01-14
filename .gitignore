@@ -9,6 +9,8 @@ venv_*
 textsum/bazel-*
 textsum/log_root/*
 *.gz
+running_log.txt
+log_root*
 
 # Project stuff
 entrance/settings_database.py
