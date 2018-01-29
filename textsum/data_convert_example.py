@@ -14,8 +14,8 @@ from tensorflow.core.example import example_pb2
 
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('command', 'binary_to_text',
-                                                     'Either binary_to_text or text_to_binary.'
-                                                     'Specify FLAGS.in_file accordingly.')
+                           'Either binary_to_text or text_to_binary.'
+                           'Specify FLAGS.in_file accordingly.')
 tf.app.flags.DEFINE_string('in_file', '', 'path to file')
 tf.app.flags.DEFINE_string('out_file', '', 'path to file')
 

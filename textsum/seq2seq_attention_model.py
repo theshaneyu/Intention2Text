@@ -23,14 +23,14 @@ from six.moves import xrange
 import tensorflow as tf
 
 HParams = namedtuple('HParams',
-                                         'mode, min_lr, lr, batch_size, '
-                                         'enc_layers, enc_timesteps, dec_timesteps, '
-                                         'min_input_len, num_hidden, emb_dim, max_grad_norm, '
-                                         'num_softmax_samples')
+                     'mode, min_lr, lr, batch_size, '
+                     'enc_layers, enc_timesteps, dec_timesteps, '
+                     'min_input_len, num_hidden, emb_dim, max_grad_norm, '
+                     'num_softmax_samples')
 
 
 def _extract_argmax_and_embed(embedding, output_projection=None,
-                                                            update_embedding=True):
+                              update_embedding=True):
     """Get a loop_function that extracts the previous symbol and embeds it.
 
     Args:
@@ -68,37 +68,37 @@ class Seq2SeqAttentionModel(object):
         self._cur_gpu = 0
 
     def run_train_step(self, sess, article_batch, abstract_batch, targets,
-                                         article_lens, abstract_lens, loss_weights):
+                       article_lens, abstract_lens, loss_weights):
         to_return = [self._train_op, self._summaries, self._loss, self.global_step]
         return sess.run(to_return,
-                                        feed_dict={self._articles: article_batch,
-                                                             self._abstracts: abstract_batch,
-                                                             self._targets: targets,
-                                                             self._article_lens: article_lens,
-                                                             self._abstract_lens: abstract_lens,
-                                                             self._loss_weights: loss_weights})
+                        feed_dict={self._articles: article_batch,
+                                   self._abstracts: abstract_batch,
+                                   self._targets: targets,
+                                   self._article_lens: article_lens,
+                                   self._abstract_lens: abstract_lens,
+                                   self._loss_weights: loss_weights})
 
     def run_eval_step(self, sess, article_batch, abstract_batch, targets,
-                                        article_lens, abstract_lens, loss_weights):
+                      article_lens, abstract_lens, loss_weights):
         to_return = [self._summaries, self._loss, self.global_step]
         return sess.run(to_return,
-                                        feed_dict={self._articles: article_batch,
-                                                             self._abstracts: abstract_batch,
-                                                             self._targets: targets,
-                                                             self._article_lens: article_lens,
-                                                             self._abstract_lens: abstract_lens,
-                                                             self._loss_weights: loss_weights})
+                        feed_dict={self._articles: article_batch,
+                                   self._abstracts: abstract_batch,
+                                   self._targets: targets,
+                                   self._article_lens: article_lens,
+                                   self._abstract_lens: abstract_lens,
+                                   self._loss_weights: loss_weights})
 
     def run_decode_step(self, sess, article_batch, abstract_batch, targets,
-                                            article_lens, abstract_lens, loss_weights):
+                        article_lens, abstract_lens, loss_weights):
         to_return = [self._outputs, self.global_step]
         return sess.run(to_return,
-                                        feed_dict={self._articles: article_batch,
-                                                             self._abstracts: abstract_batch,
-                                                             self._targets: targets,
-                                                             self._article_lens: article_lens,
-                                                             self._abstract_lens: abstract_lens,
-                                                             self._loss_weights: loss_weights})
+                        feed_dict={self._articles: article_batch,
+                                   self._abstracts: abstract_batch,
+                                   self._targets: targets,
+                                   self._article_lens: article_lens,
+                                   self._abstract_lens: abstract_lens,
+                                   self._loss_weights: loss_weights})
 
     def _next_device(self):
         """Round robin the gpu device. (Reserve last gpu for expensive op)."""
@@ -118,21 +118,21 @@ class Seq2SeqAttentionModel(object):
         """Inputs to be fed to the graph."""
         hps = self._hps
         self._articles = tf.placeholder(tf.int32,
-                                                                        [hps.batch_size, hps.enc_timesteps],
-                                                                        name='articles')
+                                        [hps.batch_size, hps.enc_timesteps],
+                                        name='articles')
         self._abstracts = tf.placeholder(tf.int32,
-                                                                         [hps.batch_size, hps.dec_timesteps],
-                                                                         name='abstracts')
+                                         [hps.batch_size, hps.dec_timesteps],
+                                         name='abstracts')
         self._targets = tf.placeholder(tf.int32,
-                                                                     [hps.batch_size, hps.dec_timesteps],
-                                                                     name='targets')
+                                       [hps.batch_size, hps.dec_timesteps],
+                                       name='targets')
         self._article_lens = tf.placeholder(tf.int32, [hps.batch_size],
-                                                                                name='article_lens')
+                                            name='article_lens')
         self._abstract_lens = tf.placeholder(tf.int32, [hps.batch_size],
-                                                                                 name='abstract_lens')
+                                             name='abstract_lens')
         self._loss_weights = tf.placeholder(tf.float32,
-                                                                                [hps.batch_size, hps.dec_timesteps],
-                                                                                name='loss_weights')
+                                            [hps.batch_size, hps.dec_timesteps],
+                                            name='loss_weights')
 
     def _add_seq2seq(self):
         hps = self._hps
@@ -151,9 +151,9 @@ class Seq2SeqAttentionModel(object):
                         'embedding', [vsize, hps.emb_dim], dtype=tf.float32,
                         initializer=tf.truncated_normal_initializer(stddev=1e-4))
                 emb_encoder_inputs = [tf.nn.embedding_lookup(embedding, x)
-                                                            for x in encoder_inputs]
+                                            for x in encoder_inputs]
                 emb_decoder_inputs = [tf.nn.embedding_lookup(embedding, x)
-                                                            for x in decoder_inputs]
+                                            for x in decoder_inputs]
 
             for layer_i in xrange(hps.enc_layers):
                 with tf.variable_scope('encoder%d'%layer_i), tf.device(
@@ -269,8 +269,8 @@ class Seq2SeqAttentionModel(object):
             dec_in_state: The decoder layer initial state.
         """
         results = sess.run([self._enc_top_states, self._dec_in_state],
-                                             feed_dict={self._articles: enc_inputs,
-                                                                    self._article_lens: enc_len})
+                           feed_dict={self._articles: enc_inputs,
+                                      self._article_lens: enc_len})
         return results[0], results[1][0]
 
     def decode_topk(self, sess, latest_tokens, enc_top_states, dec_init_states):
