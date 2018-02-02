@@ -30,9 +30,6 @@ import data
 import seq2seq_attention_decode
 import seq2seq_attention_model
 
-# 執行過程輸出redirect到running_log.txt
-sys.stdout = open('running_log.txt', 'w')
-
 
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('data_path', '', 'Path expression to tf.Example.')
@@ -78,7 +75,7 @@ def _RunningAvgLoss(loss, running_avg_loss, summary_writer, step, decay=0.999):
     loss_sum = tf.Summary()
     loss_sum.value.add(tag='running_avg_loss', simple_value=running_avg_loss)
     summary_writer.add_summary(loss_sum, step)
-    print('running_avg_loss: %f\n' % running_avg_loss, flush=True)
+    print('running_avg_loss: %f' % running_avg_loss, flush=True)
     return running_avg_loss
 
 
