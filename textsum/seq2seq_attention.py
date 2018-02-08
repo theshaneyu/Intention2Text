@@ -61,7 +61,7 @@ tf.app.flags.DEFINE_bool('use_bucketing', False,
 tf.app.flags.DEFINE_bool('truncate_input', False,
                          'Truncate inputs that are too long. If False, '
                          'examples that are too long are discarded.')
-tf.app.flags.DEFINE_integer('num_gpus', 2, 'Number of gpus used.')
+tf.app.flags.DEFINE_integer('num_gpus', 1, 'Number of gpus used.')
 tf.app.flags.DEFINE_integer('random_seed', 111, 'A seed value for randomness.')
 
 

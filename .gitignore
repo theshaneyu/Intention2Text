@@ -11,6 +11,12 @@ textsum/log_root/*
 *.gz
 running_log.txt
 log_root*
+sogo_news_corpus/backup
+sogo_news_corpus/corpus
+sogo_news_corpus/jieba_dict
+
+
+
 
 # Project stuff
 entrance/settings_database.py
