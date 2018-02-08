@@ -14,6 +14,8 @@ log_root*
 sogo_news_corpus/backup
 sogo_news_corpus/corpus
 sogo_news_corpus/jieba_dict
+sogo_news_corpus/opencc-python/
+temp*
 
 
 

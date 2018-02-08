@@ -1,7 +1,10 @@
 import xml.etree.ElementTree as ET
 from pprint import pprint
+import json
+from opencc import OpenCC 
 
 
+"""一些corpus前處理的工作"""
 def clean_junk_and_insert_root_tag():
     counter = 0
     with open('corpus.xml', 'w') as wf:
@@ -15,44 +18,65 @@ def clean_junk_and_insert_root_tag():
         wf.write('</root>')
 
 def xml_to_json():
-    tree = ET.parse('./corpus.xml')
+    """
+    1. 簡轉繁
+    2. xml轉json
+    3. 全形符號轉半形
+    """
+    openCC = OpenCC('s2t')  # 簡轉繁
+
+    tree = ET.parse('./corpus/corpus.xml')
     root = tree.getroot()
 
     output_list = []
     c = 0
+    nothing = 0
     for doc in root.findall('doc'):
+        c += 1
+        if c % 10000 == 0:
+            print('----處理進度 %d----' % c)
+        
         output_dict = {}
         content = doc.find('content').text
-        if content:
-            output_dict['abstract'] = _strQ2B(doc.find('contenttitle').text.replace('　', ''))
-            output_dict['article'] = _strQ2B(content.replace('　', '').replace('\n', ''))
+        title = doc.find('contenttitle').text
+        if content and title:
+            output_dict['abstract'] = openCC.convert(_full_to_half(title))
+            output_dict['article'] = openCC.convert(_full_to_half(content))
             output_list.append(output_dict)
         else:
-            print('沒東西')
-        c += 1
-        if c % 10 == 0:
-            print(c)
-        if c == 100:
+            nothing += 1
+            if nothing % 1000 == 0:
+                print('沒東西 %d' % nothing)
+            continue
+    with open('corpus/corpus.json', 'w') as wf:
+        json.dump(output_list, wf)
+
+def _full_to_half(s):
+    """全形符號轉半行"""
+    n = []
+    s = s.replace('\n', '').replace('·', '') # 清理不要的字元
+    for char in s:
+        if char == '，': # 如果是全形逗點，就不轉半形
+            n.append(char)
+            continue
+        num = ord(char)
+        if num == 0x3000:
+            num = 32
+        elif 0xFF01 <= num <= 0xFF5E:
+            num -= 0xfee0
+        num = chr(num)
+        n.append(num)
+    return ''.join(n)
+
+def read_json():
+    with open('./corpus.json', 'r') as rf:
+        content = json.load(rf)
+        for item in content:
+            print(item)
             break
-    pprint(output_list)
-
-def _strQ2B(ustring):
-    """把字符串全角转半角"""
-    rstring = ''
-    for uchar in ustring:
-        inside_code = ord(uchar)
-        if inside_code == 0x3000:
-            inside_code = 0x0020
-        else:
-            inside_code -= 0xfee0
-        if inside_code < 0x0020 or inside_code > 0x7e: # 转完之后不是半角字符返回原来的字符
-            rstring += uchar
-        rstring += chr(inside_code)
-    return rstring
-
-
 
 
 if __name__ == '__main__':
     # clean_junk_and_insert_root_tag()
-    xml_to_json()
+    # xml_to_json()
+    read_json()
