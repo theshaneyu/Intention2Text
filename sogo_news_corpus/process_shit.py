@@ -6,8 +6,6 @@ import jieba
 import json
 
 
-jieba.load_userdict('./jieba_dict/udic_jieba_dict.txt')
-
 def clean_junk_and_insert_root_tag():
     counter = 0
     with open('corpus.xml', 'w') as wf:
@@ -72,6 +70,7 @@ def _full_to_half(s):
 
 def segmentation():
     """斷詞"""
+    jieba.load_userdict('./jieba_dict/udic_jieba_dict.txt')
     output_list = []
     c = 0
     with open('./corpus/corpus_no_seg.json', 'r') as rf:
@@ -94,10 +93,26 @@ def _filter_junk_word(seg_list):
             clean_seg.append(word)
     return clean_seg
 
+def read_json():
+    c = 0
+    out_list = []
+    with open('./corpus/corpus.json', 'r') as rf:
+        for item in json.load(rf):
+            out_dict = {}
+            out_dict['abstract'] = item['abstract']
+            c += 1
+            if c == 100:
+                break
+
+def insert_tags(string):
+    pass
+
+
 
 if __name__ == '__main__':
     # clean_junk_and_insert_root_tag()
     # xml_to_json()
     # read_json()
-    segmentation()
+    # segmentation()
+    read_json()
     
