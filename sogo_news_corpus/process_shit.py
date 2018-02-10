@@ -1,10 +1,13 @@
+"""一些corpus前處理的工作"""
 import xml.etree.ElementTree as ET
 from pprint import pprint
-import json
 from opencc import OpenCC 
+import jieba
+import json
 
 
-"""一些corpus前處理的工作"""
+jieba.load_userdict('./jieba_dict/udic_jieba_dict.txt')
+
 def clean_junk_and_insert_root_tag():
     counter = 0
     with open('corpus.xml', 'w') as wf:
@@ -46,8 +49,7 @@ def xml_to_json():
         else:
             nothing += 1
             if nothing % 1000 == 0:
-                print('沒東西 %d' % nothing)
-            continue
+                print('沒東西筆數 %d' % nothing)
     with open('corpus/corpus.json', 'w') as wf:
         json.dump(output_list, wf)
 
@@ -68,15 +70,34 @@ def _full_to_half(s):
         n.append(num)
     return ''.join(n)
 
-def read_json():
-    with open('./corpus.json', 'r') as rf:
-        content = json.load(rf)
-        for item in content:
-            print(item)
-            break
+def segmentation():
+    """斷詞"""
+    output_list = []
+    c = 0
+    with open('./corpus/corpus_no_seg.json', 'r') as rf:
+        for item in json.load(rf):
+            output_dict = {}
+            output_dict['abstract'] = ' '.join(_filter_junk_word(jieba.lcut(item['abstract'], cut_all=False)))
+            output_dict['article'] = ' '.join(_filter_junk_word(jieba.lcut(item['article'], cut_all=False)))
+            output_list.append(output_dict)
+            c += 1
+            if c % 1000 == 0:
+                print('完成文章數: %d' % c)
+    with open('./corpus/corpus.json', 'w') as wf:
+        json.dump(output_list, wf)
+
+def _filter_junk_word(seg_list):
+    """過濾斷詞後不要的東西"""
+    clean_seg = []
+    for word in seg_list:
+        if word != ' ':
+            clean_seg.append(word)
+    return clean_seg
 
 
 if __name__ == '__main__':
     # clean_junk_and_insert_root_tag()
     # xml_to_json()
-    read_json()
+    # read_json()
+    segmentation()
+    
