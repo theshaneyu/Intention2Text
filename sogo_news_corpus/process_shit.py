@@ -5,6 +5,7 @@ from opencc import OpenCC
 import jieba
 import json
 
+lock = True
 
 def clean_junk_and_insert_root_tag():
     counter = 0
@@ -93,26 +94,63 @@ def _filter_junk_word(seg_list):
             clean_seg.append(word)
     return clean_seg
 
-def read_json():
+def add_tags():
     c = 0
     out_list = []
     with open('./corpus/corpus.json', 'r') as rf:
         for item in json.load(rf):
-            out_dict = {}
-            out_dict['abstract'] = item['abstract']
+            output_dict = {}
+            output_dict['abstract'] = _insert_tags(item['abstract'])
+            output_dict['article'] = _insert_tags(item['article'])
+            out_list.append(output_dict)
+            c += 1
+            if c % 5000 == 0:
+                print(c)
+    with open('./corpus/corpus_with_tags.json', 'w') as wf:
+        json.dump(out_list, wf)
+
+def _insert_tags(string):
+    """把每個文章加上<s><p><d>標籤"""
+    global lock
+    sentence_list = string.split('。')
+    # print(len(sentence_list))
+    final_output = ''
+    for item in sentence_list: # 一個item是一個句子
+        if item != '':
+            final_output += _sentence_tag(item)
+    lock = True
+    final_output = _paragraph_tag(final_output)
+    return final_output
+
+def _sentence_tag(sentence):
+    """加上<s>標籤"""
+    global lock
+    if lock: # 第一行的<s>要加空白，其他不用
+        lock = False
+        return '<s> ' + sentence + '。 </s> '
+    else:
+        return '<s>' + sentence + '。 </s> '
+
+def _paragraph_tag(paragraph):
+    """加上<p>標籤和<d>標籤"""
+    return '<d> <p> ' + paragraph + '</p> </d>'
+
+def check_result():
+    c = 0
+    with open('./corpus/corpus_with_tags.json', 'r') as rf:
+        for item in json.load(rf):
+            print(item)
             c += 1
             if c == 100:
                 break
 
-def insert_tags(string):
-    pass
 
 
 
 if __name__ == '__main__':
     # clean_junk_and_insert_root_tag()
     # xml_to_json()
-    # read_json()
     # segmentation()
-    read_json()
+    # add_tags()
+    check_result()
     
