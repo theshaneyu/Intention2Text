@@ -1,3 +1,4 @@
+vocab
 WORKSPACE
 bazel-bin
 bazel-genfiles

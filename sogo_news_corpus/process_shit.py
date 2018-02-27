@@ -145,8 +145,6 @@ def check_result():
                 break
 
 
-
-
 if __name__ == '__main__':
     # clean_junk_and_insert_root_tag()
     # xml_to_json()
