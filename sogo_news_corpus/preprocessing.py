@@ -4,6 +4,7 @@ from pprint import pprint
 from opencc import OpenCC 
 import jieba
 import json
+import re
 
 lock = True
 
@@ -21,6 +22,7 @@ def clean_junk_and_insert_root_tag():
 
 def xml_to_json():
     """
+    <step1>
     1. 簡轉繁
     2. xml轉json
     3. 全形符號轉半形
@@ -49,7 +51,7 @@ def xml_to_json():
             nothing += 1
             if nothing % 1000 == 0:
                 print('沒東西筆數 %d' % nothing)
-    with open('corpus/corpus.json', 'w') as wf:
+    with open('corpus/corpus_1.json', 'w') as wf:
         json.dump(output_list, wf)
 
 def _full_to_half(s):
@@ -74,7 +76,7 @@ def segmentation():
     jieba.load_userdict('./jieba_dict/udic_jieba_dict.txt')
     output_list = []
     c = 0
-    with open('./corpus/corpus_no_seg.json', 'r') as rf:
+    with open('./corpus/corpus_1.json', 'r') as rf:
         for item in json.load(rf):
             output_dict = {}
             output_dict['abstract'] = ' '.join(_filter_junk_word(jieba.lcut(item['abstract'], cut_all=False)))
@@ -83,7 +85,7 @@ def segmentation():
             c += 1
             if c % 1000 == 0:
                 print('完成文章數: %d' % c)
-    with open('./corpus/corpus.json', 'w') as wf:
+    with open('./corpus/corpus_seg_2.json', 'w') as wf:
         json.dump(output_list, wf)
 
 def _filter_junk_word(seg_list):
@@ -95,9 +97,10 @@ def _filter_junk_word(seg_list):
     return clean_seg
 
 def add_tags():
+    """加標籤"""
     c = 0
     out_list = []
-    with open('./corpus/corpus.json', 'r') as rf:
+    with open('./corpus/corpus_seg_2.json', 'r') as rf:
         for item in json.load(rf):
             output_dict = {}
             output_dict['abstract'] = _insert_tags(item['abstract'])
@@ -106,7 +109,7 @@ def add_tags():
             c += 1
             if c % 5000 == 0:
                 print(c)
-    with open('./corpus/corpus_with_tags.json', 'w') as wf:
+    with open('./corpus/corpus_with_tags_3.json', 'w') as wf:
         json.dump(out_list, wf)
 
 def _insert_tags(string):
@@ -135,14 +138,42 @@ def _paragraph_tag(paragraph):
     """加上<p>標籤和<d>標籤"""
     return '<d> <p> ' + paragraph + '</p> </d>'
 
-def check_result():
-    c = 0
-    with open('./corpus/corpus_with_tags.json', 'r') as rf:
-        for item in json.load(rf):
-            print(item)
-            c += 1
-            if c == 100:
-                break
+
+class convert_number_and_UNK(object):
+    """docstring for ClassName"""
+    def __init__(self):
+        self.vocab_set = set()
+        with open('./vocab_before_UNK', 'r') as rf:
+            for line in rf.readlines():
+                self.vocab_set.add(line.replace('\n', '').split()[0])
+
+    def exec(self, output_file_name):
+        out_list = []
+        c = 0
+        with open('./corpus/corpus_with_tags_3.json', 'r') as rf:
+            for item in json.load(rf):
+                output_dict = {}
+                output_dict['abstract'] = self._convert_UNK(self._convert_num(item['abstract']))
+                output_dict['article'] = self._convert_UNK(self._convert_num(item['article']))
+                out_list.append(output_dict)
+                c += 1
+                if c % 5000 == 0:
+                    print(c)
+        with open('./corpus/' + output_file_name, 'w') as wf:
+            json.dump(out_list, wf)
+
+    def _convert_num(self, whole_str):
+        return re.sub('\d', '#', whole_str)
+
+    def _convert_UNK(self, whole_str):
+        converted_word_list = []
+        for word in whole_str.split(): # loop over整個文章
+            if word in self.vocab_set:
+                converted_word_list.append(word)
+            else:
+                converted_word_list.append('<UNK>')
+        return ' '.join(converted_word_list)
+
 
 
 if __name__ == '__main__':
@@ -150,5 +181,8 @@ if __name__ == '__main__':
     # xml_to_json()
     # segmentation()
     # add_tags()
-    check_result()
+    # check_result()
+
+    obj = convert_number_and_UNK()
+    obj.exec('corpus_converted_num_and_UNK_4.json')
     
