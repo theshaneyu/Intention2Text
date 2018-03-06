@@ -3,7 +3,7 @@ from collections import Counter
 from operator import itemgetter
 
 class gen_vocab(object):
-    """docstring for gen_vocab"""
+    """用於產生vocab"""
     def __init__(self):
         pass
 
@@ -14,6 +14,7 @@ class gen_vocab(object):
                 wf.write(pair[0] + ' ' + str(pair[1]) + '\n')
 
     def gen_vocab_before_UNK(self, cnt):
+        """由全部的文本產生前400000的vocab，可以用此vocab來標記<UNK>標籤"""
         with open('./vocab_before_UNK', 'w') as wf:
             for pair in cnt.most_common(400000):
                 wf.write(pair[0] + ' ' + str(pair[1]) + '\n')
@@ -23,8 +24,8 @@ class gen_vocab(object):
         with open('./vocab', 'w') as wf:
             for pair in cnt.most_common(400000):
                 wf.write(pair[0] + ' ' + str(pair[1]) + '\n')
+            wf.write('<PAD> 0')
         
-
     def get_word_count(self, input_file_name):
         """回傳word count的Counter"""
         with open('./corpus/' + input_file_name, 'r') as rf:
@@ -42,7 +43,7 @@ class gen_vocab(object):
             count += 1
             if count % 10000 == 0:
                 print('word count已算完 %d 筆' % count)
-        # print('全部的詞數量', len(cnt)) # 數字慘sharp前1373057，數字轉sharp後1197601
+        # print('全部的詞數量', len(cnt)) # 數字轉sharp前1373057，數字轉sharp後1197601
         return cnt
 
     def main(self):

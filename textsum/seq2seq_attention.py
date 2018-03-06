@@ -44,7 +44,7 @@ tf.app.flags.DEFINE_string('train_dir', '', 'Directory for train.')
 tf.app.flags.DEFINE_string('eval_dir', '', 'Directory for eval.')
 tf.app.flags.DEFINE_string('decode_dir', '', 'Directory for decode summaries.')
 tf.app.flags.DEFINE_string('mode', 'train', 'train/eval/decode mode')
-tf.app.flags.DEFINE_integer('max_run_steps', 100,
+tf.app.flags.DEFINE_integer('max_run_steps', 100000000,
                             'Maximum number of run steps.')
 tf.app.flags.DEFINE_integer('max_article_sentences', 2,
                             'Max number of first sentences to use from the '

@@ -174,6 +174,27 @@ class convert_number_and_UNK(object):
                 converted_word_list.append('<UNK>')
         return ' '.join(converted_word_list)
 
+class convert_to_input_format(object):
+    """把json處理成input可以吃的格式
+    input: corpus_converted_num_and_UNK_4.json
+    output: corpus_5
+    """
+    def __init__(self):
+        pass
+
+    def convert(self):
+        with open('./corpus/corpus_converted_num_and_UNK_4.json', 'r') as rf:
+            content = json.load(rf)
+        c = 0
+        with open('./corpus/corpus_5', 'w') as wf:
+            for item in content:
+                wf.write('abstract=' + item['abstract'])
+                wf.write('\t')
+                wf.write('article=' + item['article'])
+                wf.write('\n')
+                c += 1
+                if c % 10000 == 0:
+                    print(c)
 
 
 if __name__ == '__main__':
@@ -183,6 +204,9 @@ if __name__ == '__main__':
     # add_tags()
     # check_result()
 
-    obj = convert_number_and_UNK()
-    obj.exec('corpus_converted_num_and_UNK_4.json')
+    # obj = convert_number_and_UNK()
+    # obj.exec('corpus_converted_num_and_UNK_4.json')
+
+    obj = convert_to_input_format()
+    obj.convert()
     

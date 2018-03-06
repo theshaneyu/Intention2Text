@@ -17,6 +17,8 @@ sogo_news_corpus/corpus
 sogo_news_corpus/jieba_dict
 sogo_news_corpus/opencc-python/
 temp*
+data/*
+toy_data/*
 
 
 
