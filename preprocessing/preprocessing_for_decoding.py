@@ -96,8 +96,6 @@ class preprocessing(object):
         return ' '.join(converted_word_list)
 
 
-
-
 if __name__ == '__main__':
     obj = preprocessing()
     obj.main('test_decoding.json', 'test.json', 'test')

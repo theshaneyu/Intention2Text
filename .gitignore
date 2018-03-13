@@ -16,7 +16,9 @@ preprocessing/backup
 preprocessing/corpus
 preprocessing/jieba_dict
 preprocessing/opencc-python/
-preprocessing/*vocab*
+preprocessing/vocab
+preprocessing/vocab_before_UNK
+preprocessing/all_vocab
 preprocessing/nohup.out
 preprocessing/*temp*
 preprocessing/*test*

@@ -45,7 +45,7 @@ def _text_to_binary():
         tf_example = example_pb2.Example()
         for feature in inp.strip().split('\t'):
             (k, v) = feature.split('=')
-            tf_example.features.feature[k].bytes_list.value.extend([v])
+            tf_example.features.feature[k.encode('utf8')].bytes_list.value.extend([v.encode('utf8')])
         tf_example_str = tf_example.SerializeToString()
         str_len = len(tf_example_str)
         writer.write(struct.pack('q', str_len))
