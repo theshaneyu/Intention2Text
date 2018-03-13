@@ -29,8 +29,8 @@ import tensorflow as tf
 import data
 
 ModelInput = namedtuple('ModelInput',
-                                                'enc_input dec_input target enc_len dec_len '
-                                                'origin_article origin_abstract')
+                        'enc_input dec_input target enc_len dec_len '
+                        'origin_article origin_abstract')
 
 BUCKET_CACHE_BATCH = 100
 QUEUE_NUM_BATCH = 100
@@ -38,10 +38,11 @@ QUEUE_NUM_BATCH = 100
 
 class Batcher(object):
     """Batch reader with shuffling and bucketing support."""
+    # 這個class在seq2seq_attention.py中被使用
 
     def __init__(self, data_path, vocab, hps,
-                             article_key, abstract_key, max_article_sentences,
-                             max_abstract_sentences, bucketing=True, truncate_input=False):
+                 article_key, abstract_key, max_article_sentences,
+                 max_abstract_sentences, bucketing=True, truncate_input=False):
         """Batcher constructor.
 
         Args:
