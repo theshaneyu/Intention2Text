@@ -10,7 +10,7 @@ class preprocessing(object):
     def __init__(self):
         jieba.load_userdict('./jieba_dict/udic_jieba_dict.txt')
         self.vocab_set = set()
-        with open('./data/vocab', 'r') as rf:
+        with open('../data/vocab', 'r') as rf:
             for line in rf.readlines():
                 self.vocab_set.add(line.replace('\n', '').split()[0])
 

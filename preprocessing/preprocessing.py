@@ -5,6 +5,7 @@ from opencc import OpenCC
 import jieba
 import json
 import re
+import random
 
 lock = True
 
@@ -196,6 +197,19 @@ class convert_to_input_format(object):
                 if c % 10000 == 0:
                     print(c)
 
+class sample_articles_from_corpus(object):
+    """抽樣N筆文章出來看"""
+    def __init__(self):
+        pass
+
+    def main(self, num):
+        with open('./corpus/corpus_1.json', 'r') as rf:
+            content = json.load(rf)
+        random_items = random.sample(content, num)
+        with open('./temp.json', 'w') as wf:
+            json.dump(random_items, wf)
+        
+
 
 if __name__ == '__main__':
     # clean_junk_and_insert_root_tag()
@@ -207,6 +221,9 @@ if __name__ == '__main__':
     # obj = convert_number_and_UNK()
     # obj.exec('corpus_converted_num_and_UNK_4.json')
 
-    obj = convert_to_input_format()
-    obj.convert()
+    # obj = convert_to_input_format()
+    # obj.convert()
+
+    obj = sample_articles_from_corpus()
+    obj.main(10)
     
