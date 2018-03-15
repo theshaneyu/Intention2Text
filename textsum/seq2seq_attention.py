@@ -31,7 +31,7 @@ import seq2seq_attention_decode
 import seq2seq_attention_model
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0" # 指定用第2顆GPU跑
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0" # 指定用第2顆GPU跑
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -55,7 +55,7 @@ tf.app.flags.DEFINE_integer('max_article_sentences', 2,
 tf.app.flags.DEFINE_integer('max_abstract_sentences', 100,
                             'Max number of first sentences to use from the '
                             'abstract')
-tf.app.flags.DEFINE_integer('beam_size', 4,
+tf.app.flags.DEFINE_integer('beam_size', 12,
                             'beam size for beam search decoding.')
 tf.app.flags.DEFINE_integer('eval_interval_secs', 60, 'How often to run eval.')
 tf.app.flags.DEFINE_integer('checkpoint_secs', 60, 'How often to checkpoint.')
