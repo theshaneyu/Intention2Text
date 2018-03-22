@@ -31,7 +31,7 @@ import seq2seq_attention_decode
 import seq2seq_attention_model
 import os
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0" # 指定用第2顆GPU跑
+os.environ["CUDA_VISIBLE_DEVICES"] = "1" # 指定用第2顆GPU跑
 
 
 FLAGS = tf.app.flags.FLAGS

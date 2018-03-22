@@ -18,9 +18,9 @@ class preprocessing(object):
         corpus_json = self.get_json(in_file_path)
         with open(out_json_name, 'w') as wf: # 保留一份json檔
             json.dump(corpus_json, wf)
-        self.get_input_data_format(corpus_json, out_file_name)
+        self.gen_input_data(corpus_json, out_file_name)
 
-    def get_input_data_format(self, content, out_file_name):
+    def gen_input_data(self, content, out_file_name):
         with open(out_file_name, 'w') as wf:
             for item in content:
                 wf.write('abstract=' + item['abstract'])
@@ -41,9 +41,6 @@ class preprocessing(object):
                     after_convert_UNK = self._convert_UNK(after_convert_num)
                     output_dict[a] = after_convert_UNK
                 output_list.append(output_dict)
-                # c += 1
-                # if c % 1000 == 0:
-                #     print('完成文章數: %d' % c)
         return output_list
 
     def segmentation(self, string):
@@ -98,7 +95,7 @@ class preprocessing(object):
 
 if __name__ == '__main__':
     obj = preprocessing()
-    obj.main('test_decoding.json', 'test.json', 'test')
+    obj.main('decoding_corpus/decoding_corpus.json', 'decoding_corpus/test.json', 'decoding_corpus/test')
 
     # with open('./test_decoding.json', 'r') as rf:
     # for news in json.load(rf):
