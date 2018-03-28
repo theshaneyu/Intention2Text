@@ -37,10 +37,9 @@ def _binary_to_text():
     reader.close()
     writer.close()
 
-
-def _text_to_binary():
-    inputs = open(FLAGS.in_file, 'r').readlines()
-    writer = open(FLAGS.out_file, 'wb')
+def text_to_binary(in_file_path, out_file_path):
+    inputs = open(in_file_path, 'r').readlines()
+    writer = open(out_file_path, 'wb')
     for inp in inputs:
         tf_example = example_pb2.Example()
         for feature in inp.strip().split('\t'):
@@ -51,7 +50,6 @@ def _text_to_binary():
         writer.write(struct.pack('q', str_len))
         writer.write(struct.pack('%ds' % str_len, tf_example_str))
     writer.close()
-
 
 def main(unused_argv):
     assert FLAGS.command and FLAGS.in_file and FLAGS.out_file

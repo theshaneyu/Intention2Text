@@ -2,6 +2,7 @@ import json
 import jieba
 from pprint import pprint
 import re
+from data_convert_example import text_to_binary
 
 
 lock = True
@@ -19,6 +20,7 @@ class preprocessing(object):
         with open(out_json_name, 'w') as wf: # 保留一份json檔
             json.dump(corpus_json, wf)
         self.gen_input_data(corpus_json, out_file_name)
+        text_to_binary('decoding_corpus/test', '../data/test2')
 
     def gen_input_data(self, content, out_file_name):
         with open(out_file_name, 'w') as wf:
@@ -92,11 +94,30 @@ class preprocessing(object):
                 converted_word_list.append('<UNK>')
         return ' '.join(converted_word_list)
 
+    def gen_json_through_terminal_input(self):
+        output_list = []
+        while True:
+            content = dict()
+            article = input('[文章內容]\n')
+            abstract = input('[文章標題]\n')
+            go_on = input('繼續輸入？(Y/N) ')
+            content['article'] = article
+            content['abstract'] = abstract
+            output_list.append(content)
+            if go_on == 'N':
+                break
+        with open('decoding_corpus/decoding_corpus.json', 'w') as wf:
+            json.dump(output_list, wf)
+
+
+
 
 if __name__ == '__main__':
     obj = preprocessing()
+    """paprameters
+    1. 輸入文章json
+    2. 輸出經過處理後的json
+    3. 輸出，可以讓模型吃的格式
+    """
+    # obj.gen_json_through_terminal_input()
     obj.main('decoding_corpus/decoding_corpus.json', 'decoding_corpus/test.json', 'decoding_corpus/test')
-
-    # with open('./test_decoding.json', 'r') as rf:
-    # for news in json.load(rf):
-    #     for item in news: # abstract和article

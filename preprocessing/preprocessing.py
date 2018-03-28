@@ -203,11 +203,14 @@ class sample_articles_from_corpus(object):
         pass
 
     def main(self, num):
-        with open('./corpus/corpus_converted_num_and_UNK_4.json', 'r') as rf:
+        with open('./corpus/corpus_1.json', 'r') as rf:
             content = json.load(rf)
+        c = 0
         for item in content:
             print(item)
-            break
+            c += 1
+            if c == 10:
+                break
         # random_items = random.sample(content, num)
         # with open('./temp.json', 'w') as wf:
         #     json.dump(random_items, wf)
