@@ -2,6 +2,8 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
 import ssl, requests, urllib, sys, json, pyprind
 from bs4 import BeautifulSoup
+from pprint import pprint
+
 
 class MyAdapter(HTTPAdapter):
     def init_poolmanager(self, connections, maxsize, block=False):
@@ -9,6 +11,8 @@ class MyAdapter(HTTPAdapter):
                                        maxsize=maxsize,
                                        block=block,
                                        ssl_version=ssl.PROTOCOL_TLSv1)
+
+
 class GoogleSearch(object):
     def __init__(self, adapters, keyword):
         self.keyword = keyword
@@ -43,7 +47,6 @@ class GoogleSearch(object):
         self.get('span._Xbe.kno-fv', 'Capital')
         self.get('#resultStats', 'resultStats')
         self.get('div._gdf.kno-fb-ctx', 'tag')
-        print(self.json)
 
     def dump(self):
         with open('GoogleSearch/{}.json'.format(self.keyword), 'w', encoding='utf-8') as f:
@@ -52,6 +55,7 @@ class GoogleSearch(object):
 if __name__ == '__main__':
     g = GoogleSearch(MyAdapter, '中興大學')
     g.getProf()
+    pprint(g.json)
 
 
     # import time, random
