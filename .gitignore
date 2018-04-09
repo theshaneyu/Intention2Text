@@ -22,6 +22,7 @@ preprocessing/nohup.out
 preprocessing/*temp*
 preprocessing/*test*
 google_search_crawler/googleresult.json
+google_search_crawler/result.json
 
 
 
