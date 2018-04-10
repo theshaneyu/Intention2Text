@@ -53,50 +53,8 @@ class GoogleSearch(object):
         with open('GoogleSearch/{}.json'.format(self.keyword), 'w', encoding='utf-8') as f:
             json.dump(self.json, f)
 
-class process_crawler_result(object):
-    """docstring for process_crawler_result"""
-    def __init__(self):
-        pass
-
-    def checking(self):
-        """產生json檔"""
-        output = []
-        count = 0
-        with open('./googleresult.json', 'r') as rf:
-            for line in rf:
-                one_line = ast.literal_eval(line)
-                output.append(one_line)
-                count += 1
-                if count % 5000 == 0:
-                    print(count)
-
-        print(len(output))
-        with open('result.json', 'w') as wf:
-            json.dump(output, wf)
-
-    def check_json(self):
-        with open('./result.json', 'r') as rf:
-            content = json.load(rf)
-
-        c = 0
-        previous_label = ''
-        for item in content:
-            if item['label'] == previous_label:
-                continue
-            pprint(item)
-            print('---------------------------------------------')
-            previous_label = item['label']
-            c += 1
-            if c == 500:
-                break
-
-
 
 if __name__ == '__main__':
-    p_obj = process_crawler_result()
-    p_obj.check_json()
-
-
     # g = GoogleSearch(MyAdapter, '中興大學')
     # g.getProf()
     # pprint(g.json)
