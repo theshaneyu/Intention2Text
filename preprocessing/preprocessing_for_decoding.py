@@ -114,7 +114,7 @@ class preprocessing(object):
 
 if __name__ == '__main__':
     obj = preprocessing()
-    """paprameters
+    """papameters
     1. 輸入文章json
     2. 輸出經過處理後的json
     3. 輸出，可以讓模型吃的格式
