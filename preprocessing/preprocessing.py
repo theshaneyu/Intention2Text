@@ -6,17 +6,12 @@ import re
 import random
 
 
-"""
-筆記：
-只保留中文字，除了中文字之外，保留逗號，句號。
-空格、半形逗號換成逗號
-接著處理連續問號的問題
-
-"""
 class preprocessing(object):
     """docstring for preprocessing"""
     def __init__(self):
-        pass
+        # jieba custom setting.
+        jieba.initialize('jieba_dict/dict.txt.big')
+        jieba.load_userdict('jieba_dict/NameDict_Ch_v2')
 
     def remove_date_at_beginning_of_context(self, data):
         """刪除context開頭的日期字串"""
@@ -47,11 +42,12 @@ class preprocessing(object):
                 else:
                     dirty_str += ch
         clean_str = self._remove_sequencial_char(clean_str)
-        print(clean_str)
-        print('<>')
-        print('<>')
-        print('<>')
-        print(dirty_str)
+        # print(clean_str)
+        # print('<>')
+        # print('<>')
+        # print('<>')
+        # print(dirty_str)
+        return clean_str
         
 
     def _remove_sequencial_char(self, string):
@@ -79,23 +75,56 @@ class preprocessing(object):
                 previous_char = c
         return result_str
 
+    def remove_comma_at_head_and_tail(self, string):
+        """移除頭和尾的逗號"""
+        if string[0] == '，':
+            string = string[1:]
+        if string[-1] == '，':
+            string = string[:-1]
+        return string
+
+    def check_for_period(self, string):
+        """確定結尾有沒有句號，如果沒有就加上去"""
+        if string[-1] != '。':
+            string += '。'
+        return string
+
+    def segmentation(self, string):
+        return ' '.join(self._filter_blank(jieba.lcut(string, cut_all=False)))
+
+    def _filter_blank(self, seg_list):
+        """斷詞之後如果某個詞是空格，就丟掉"""
+        clean_seg = []
+        for word in seg_list:
+            if word != ' ':
+                clean_seg.append(word)
+        return clean_seg
 
 
 
 
 
 
-    def go_through_all_process(self, data):
-        """走過所有清理步驟
-        輸入：字串
+
+    def go_through_processes_for_context(self, data):
+        """走過context的所有清理步驟
+        輸入：欲處理的字串
         輸出：處理好的字串
         """
-        # 砍掉context開頭的日期部分
+        # 刪除context開頭的日期字串
         data = self.remove_date_at_beginning_of_context(data)
-        # 砍掉一些不要的字元
+        # 1) 只保留中文、逗點、句點、數字 2) 空格、半形逗點轉成逗點 3) 數字轉成# 4) 清除連續的逗點、句點和#
         data = self.remove_and_convert_character(data)
+        # 移除頭和尾的逗號
+        data = self.remove_comma_at_head_and_tail(data)
+        # 確定結尾有沒有句號，如果沒有就加上去
+        data = self.check_for_period(data)
+        # 斷詞
+        data = self.segmentation(data)
 
-        print()
+        
+        print(data)
+        print()  
         print('---------------------------------------------------------------------------')
         print()
 
@@ -108,8 +137,8 @@ class preprocessing(object):
         data = random.sample(data, 100)
         
         for item in data:
-            context = self.go_through_all_process(item['context'])
-            # discription = self.go_through_all_process(item['discription'])
+            context = self.go_through_processes_for_context(item['context'])
+            # discription = self.go_through_processes_for_context(item['discription'])
 
 
 if __name__ == '__main__':
