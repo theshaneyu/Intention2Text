@@ -6,6 +6,8 @@ import re
 import random
 
 
+lock = True
+
 class preprocessing(object):
     """docstring for preprocessing"""
     def __init__(self):
@@ -100,6 +102,33 @@ class preprocessing(object):
                 clean_seg.append(word)
         return clean_seg
 
+    def insert_tags(self, string):
+        """把每個文章加上<s><p><d>標籤"""
+        sentence_list = string.split('。')
+        final_output = ''
+        for item in sentence_list: # 一個item是一個句子
+            if item != '':
+                print(item)
+                print('=')
+                # final_output += _sentence_tag(item)
+        # lock = True
+        # final_output = _paragraph_tag(final_output)
+        # return final_output
+
+    def _sentence_tag(sentence):
+        """加上<s>標籤"""
+        global lock
+        if lock: # 第一行的<s>要加空白，其他不用
+            lock = False
+            return '<s> ' + sentence + '。 </s> '
+        else:
+            return '<s>' + sentence + '。 </s> '
+
+    def _paragraph_tag(paragraph):
+        """加上<p>標籤和<d>標籤"""
+        return '<d> <p> ' + paragraph + '</p> </d>'
+
+
 
 
 
@@ -115,18 +144,19 @@ class preprocessing(object):
         data = self.remove_date_at_beginning_of_context(data)
         # 1) 只保留中文、逗點、句點、數字 2) 空格、半形逗點轉成逗點 3) 數字轉成# 4) 清除連續的逗點、句點和#
         data = self.remove_and_convert_character(data)
-        # 移除頭和尾的逗號
-        data = self.remove_comma_at_head_and_tail(data)
-        # 確定結尾有沒有句號，如果沒有就加上去
-        data = self.check_for_period(data)
-        # 斷詞
-        data = self.segmentation(data)
+        # # 移除頭和尾的逗號
+        # data = self.remove_comma_at_head_and_tail(data)
+        # # 確定結尾有沒有句號，如果沒有就加上去
+        # data = self.check_for_period(data)
+        # # 斷詞
+        # data = self.segmentation(data)
+        # # 加入標籤
+        # data = self.insert_tags(data)
 
-        
-        print(data)
-        print()  
-        print('---------------------------------------------------------------------------')
-        print()
+
+        # print()  
+        # print('---------------------------------------------------------------------------')
+        # print()
 
 
     def main(self):
@@ -134,7 +164,7 @@ class preprocessing(object):
             data = json.load(rf) # 90148筆
 
         # sample東西出來看
-        data = random.sample(data, 100)
+        # data = random.sample(data, 100)
         
         for item in data:
             context = self.go_through_processes_for_context(item['context'])
