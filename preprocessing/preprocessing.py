@@ -4,6 +4,8 @@ import jieba
 import json
 import re
 import random
+from progress.bar import IncrementalBar # 顯示進度條
+from gen_vocab import gen_vocab
 
 
 lock = True
@@ -104,18 +106,17 @@ class preprocessing(object):
 
     def insert_tags(self, string):
         """把每個文章加上<s><p><d>標籤"""
+        global lock
         sentence_list = string.split('。')
         final_output = ''
         for item in sentence_list: # 一個item是一個句子
             if item != '':
-                print(item)
-                print('=')
-                # final_output += _sentence_tag(item)
-        # lock = True
-        # final_output = _paragraph_tag(final_output)
-        # return final_output
+                final_output += self._sentence_tag(item)
+        lock = True
+        final_output = self._paragraph_tag(final_output)
+        return final_output
 
-    def _sentence_tag(sentence):
+    def _sentence_tag(self, sentence):
         """加上<s>標籤"""
         global lock
         if lock: # 第一行的<s>要加空白，其他不用
@@ -124,7 +125,7 @@ class preprocessing(object):
         else:
             return '<s>' + sentence + '。 </s> '
 
-    def _paragraph_tag(paragraph):
+    def _paragraph_tag(self, paragraph):
         """加上<p>標籤和<d>標籤"""
         return '<d> <p> ' + paragraph + '</p> </d>'
 
@@ -140,35 +141,81 @@ class preprocessing(object):
         輸入：欲處理的字串
         輸出：處理好的字串
         """
-        # 刪除context開頭的日期字串
-        data = self.remove_date_at_beginning_of_context(data)
-        # 1) 只保留中文、逗點、句點、數字 2) 空格、半形逗點轉成逗點 3) 數字轉成# 4) 清除連續的逗點、句點和#
-        data = self.remove_and_convert_character(data)
-        # # 移除頭和尾的逗號
-        # data = self.remove_comma_at_head_and_tail(data)
-        # # 確定結尾有沒有句號，如果沒有就加上去
-        # data = self.check_for_period(data)
-        # # 斷詞
-        # data = self.segmentation(data)
-        # # 加入標籤
-        # data = self.insert_tags(data)
+        try:
+            # 刪除context開頭的日期字串
+            data = self.remove_date_at_beginning_of_context(data)
+            # 1) 只保留中文、逗點、句點、數字 2) 空格、半形逗點轉成逗點 3) 數字轉成# 4) 清除連續的逗點、句點和#
+            data = self.remove_and_convert_character(data)
+            # 移除頭和尾的逗號
+            data = self.remove_comma_at_head_and_tail(data)
+            # 確定結尾有沒有句號，如果沒有就加上去
+            data = self.check_for_period(data)
+            # 斷詞
+            data = self.segmentation(data)
+            # 加入標籤
+            data = self.insert_tags(data)
+            
+            return data
+        except:
+            return
 
-
-        # print()  
-        # print('---------------------------------------------------------------------------')
-        # print()
+    def go_through_processes_for_discription(self, data):
+        try:
+            data = self.remove_and_convert_character(data)
+            data = self.remove_comma_at_head_and_tail(data)
+            data = self.check_for_period(data)
+            data = self.segmentation(data)
+            data = self.insert_tags(data)
+            
+            # print(data)
+            # print('----------------------------------------------------------------------------')
+            return data
+        except:
+            return
 
 
     def main(self):
-        with open('../yahoo_knowledge_data/crawler_result.json') as rf:
-            data = json.load(rf) # 90148筆
+        # with open('../yahoo_knowledge_data/crawler_result.json') as rf:
+        #     data = json.load(rf) # 90148筆
+        
+        # # sample東西出來看
+        # # data = random.sample(data, 50)
+
+        # bar = IncrementalBar('Processing', max=90148)
+        # out_list = []
+        # for item in data:
+        #     out_dict = {}
+        #     context = self.go_through_processes_for_context(item['context'])
+        #     discription = self.go_through_processes_for_discription(item['discription'])
+        #     if context and discription: # 共有152個錯誤
+        #         out_dict['context'] = context
+        #         out_dict['discription'] = discription
+        #         out_list.append(out_dict)
+        #     bar.next()
+
+        # with open('../yahoo_knowledge_data/preprocessed_result.json', 'w') as wf:
+        #     json.dump(out_list, wf)
+
+        
+        """
+        以上做完前處理，為了加速所以先存檔，接著下來用讀檔的比較快。之後也可以串起來一次做完。
+        """
+
+        with open('../yahoo_knowledge_data/preprocessed_result.json', 'r') as rf:
+            data = json.load(rf) # 剩下89996筆
 
         # sample東西出來看
-        # data = random.sample(data, 100)
+        # data = random.sample(data, 50)
+
+        gen = gen_vocab()
+        word_count = gen.get_word_count(data)
+        print('字典共有', len(word_count), '個字')
+
+
         
-        for item in data:
-            context = self.go_through_processes_for_context(item['context'])
-            # discription = self.go_through_processes_for_context(item['discription'])
+
+
+                
 
 
 if __name__ == '__main__':

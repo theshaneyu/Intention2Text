@@ -26,15 +26,12 @@ class gen_vocab(object):
                 wf.write(pair[0] + ' ' + str(pair[1]) + '\n')
             wf.write('<PAD> 0')
         
-    def get_word_count(self, input_file_name):
+    def get_word_count(self, data):
         """回傳word count的Counter"""
-        with open('./corpus/' + input_file_name, 'r') as rf:
-            corpus = json.load(rf)
-
         cnt = Counter()
 
         count = 0
-        for item in corpus:
+        for item in data:
             for key in item.keys(): # abstrct and article
                 for word in item[key].split():
                     if word == ' ':
@@ -43,7 +40,7 @@ class gen_vocab(object):
             count += 1
             if count % 10000 == 0:
                 print('word count已算完 %d 筆' % count)
-        # print('全部的詞數量', len(cnt)) # 數字轉sharp前1373057，數字轉sharp後1197601
+        print('全部的詞數量', len(cnt))
         return cnt
 
     def main(self):
