@@ -51,13 +51,9 @@ def text_to_binary(in_file_path, out_file_path):
         writer.write(struct.pack('%ds' % str_len, tf_example_str))
     writer.close()
 
-def main(unused_argv):
-    assert FLAGS.command and FLAGS.in_file and FLAGS.out_file
-    if FLAGS.command == 'binary_to_text':
-        _binary_to_text()
-    elif FLAGS.command == 'text_to_binary':
-        _text_to_binary()
+def main():
+    text_to_binary('../yahoo_knowledge_data/data_ready', '../yahoo_knowledge_data/data')
 
 
 if __name__ == '__main__':
-    tf.app.run()
+    main()

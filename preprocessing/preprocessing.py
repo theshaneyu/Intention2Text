@@ -160,13 +160,6 @@ class preprocessing(object):
 
 
 
-
-
-
-
-
-
-
     def go_through_processes_for_context(self, data):
         """走過context的所有清理步驟
         輸入：欲處理的字串
@@ -242,18 +235,10 @@ class preprocessing(object):
         word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
         # print(len(word_count)) # 最後版本的vocab是53107個字
 
-        gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab') # 產生vocab
+        # 產生vocab
+        gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab')
+        # 產生data_convert_example.py可以吃的格式的資料
         self.gen_input_format(data, '../yahoo_knowledge_data/data_ready')
-
-
-
-
-        
-
-
-
-        
-
 
 
 if __name__ == '__main__':
