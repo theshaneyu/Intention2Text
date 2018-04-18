@@ -11,9 +11,7 @@ from gen_vocab import gen_vocab
 lock = True
 
 class preprocessing(object):
-    """docstring for preprocessing"""
     def __init__(self):
-        # jieba custom setting.
         jieba.initialize('jieba_dict/dict.txt.big')
         jieba.load_userdict('jieba_dict/NameDict_Ch_v2')
 
