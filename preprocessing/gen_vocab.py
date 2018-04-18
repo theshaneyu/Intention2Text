@@ -19,15 +19,17 @@ class gen_vocab(object):
             for pair in cnt.most_common(400000):
                 wf.write(pair[0] + ' ' + str(pair[1]) + '\n')
 
-    def gen_final_vocab(self, cnt):
-        """產生正式的vocab（有門檻限制）"""
-        with open('./vocab', 'w') as wf:
-            for pair in cnt.most_common(400000):
+    def gen_final_vocab(self, cnt, out_path):
+        """產生正式的vocab"""
+        with open(out_path, 'w') as wf:
+            for pair in cnt:
                 wf.write(pair[0] + ' ' + str(pair[1]) + '\n')
             wf.write('<PAD> 0')
         
-    def get_word_count(self, data):
-        """回傳word count的Counter"""
+    def get_word_count_with_threshold(self, data, th):
+        """回傳word count的Counter，前k高的字，如果th=0，則不設門檻單純回傳word count
+
+        """
         cnt = Counter()
 
         count = 0
@@ -40,11 +42,13 @@ class gen_vocab(object):
             count += 1
             if count % 10000 == 0:
                 print('word count已算完 %d 筆' % count)
-        print('全部的詞數量', len(cnt))
-        return cnt
+        if th == 0:
+            return sorted(cnt.items(), key=itemgetter(1), reverse=True)
+        else:
+            return cnt.most_common(th)
 
     def main(self):
-        cnt = self.get_word_count('corpus_converted_num_and_UNK_4.json')
+        cnt = self.get_word_count_with_threshold('corpus_converted_num_and_UNK_4.json')
         self.gen_final_vocab(cnt)
 
 

@@ -46,11 +46,6 @@ class preprocessing(object):
                 else:
                     dirty_str += ch
         clean_str = self._remove_sequencial_char(clean_str)
-        # print(clean_str)
-        # print('<>')
-        # print('<>')
-        # print('<>')
-        # print(dirty_str)
         return clean_str
         
 
@@ -129,6 +124,42 @@ class preprocessing(object):
         """加上<p>標籤和<d>標籤"""
         return '<d> <p> ' + paragraph + '</p> </d>'
 
+    def convert_UNK(self, word_count, data):
+        word_pool = self._gen_word_pool(word_count)
+        out_list = []
+        for item in data:
+            out_dict = {}
+            out_dict['context'] = self._convert_UNK_for_one_string(item['context'], word_pool)
+            out_dict['discription'] = self._convert_UNK_for_one_string(item['discription'], word_pool)
+            out_list.append(out_dict)
+        return out_list
+
+    def _gen_word_pool(self, word_count):
+        word_pool = set()
+        for item in word_count: # 一個item像('日本', 8264)
+            word_pool.add(item[0])
+        return word_pool
+
+    def _convert_UNK_for_one_string(self, whole_str, word_pool):
+        converted_word_list = []
+        for word in whole_str.split(): # loop over整個文章
+            if word in word_pool:
+                converted_word_list.append(word)
+            else:
+                converted_word_list.append('<UNK>')
+        return ' '.join(converted_word_list)
+
+    def gen_input_format(self, data, out_path):
+        """產生data_convert_example.py可以吃的檔案"""
+        with open(out_path, 'w') as wf:
+            for item in data:
+                wf.write('discription=' + item['discription'])
+                wf.write('\t')
+                wf.write('context=' + item['context'])
+                wf.write('\n')
+
+
+
 
 
 
@@ -154,7 +185,6 @@ class preprocessing(object):
             data = self.segmentation(data)
             # 加入標籤
             data = self.insert_tags(data)
-            
             return data
         except:
             return
@@ -166,9 +196,6 @@ class preprocessing(object):
             data = self.check_for_period(data)
             data = self.segmentation(data)
             data = self.insert_tags(data)
-            
-            # print(data)
-            # print('----------------------------------------------------------------------------')
             return data
         except:
             return
@@ -204,18 +231,29 @@ class preprocessing(object):
         with open('../yahoo_knowledge_data/preprocessed_result.json', 'r') as rf:
             data = json.load(rf) # 剩下89996筆
 
-        # sample東西出來看
-        # data = random.sample(data, 50)
-
         gen = gen_vocab()
-        word_count = gen.get_word_count(data)
-        print('字典共有', len(word_count), '個字')
+        word_count = gen.get_word_count_with_threshold(data, 53106) # 用來轉換UNK的counter
+        data = self.convert_UNK(word_count, data) # 轉換UNK
+
+        # # sample東西出來看
+        # data = random.sample(data, 50)
+        # pprint(data)
+
+        word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
+        # print(len(word_count)) # 最後版本的vocab是53107個字
+
+        gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab') # 產生vocab
+        self.gen_input_format(data, '../yahoo_knowledge_data/data_ready')
+
+
 
 
         
 
 
-                
+
+        
+
 
 
 if __name__ == '__main__':
