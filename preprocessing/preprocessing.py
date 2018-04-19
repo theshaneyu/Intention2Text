@@ -6,6 +6,8 @@ import re
 import random
 from progress.bar import IncrementalBar # 顯示進度條
 from gen_vocab import gen_vocab
+from sklearn.model_selection import train_test_split
+from data_convert_example import text_to_binary
 
 
 lock = True
@@ -191,6 +193,12 @@ class preprocessing(object):
         except:
             return
 
+    def split_train_valid(self, data):
+        # 切割train, valid, test資料
+        train, test = train_test_split(data, test_size=.0011, random_state=34) # 抽99筆出來當testing data
+        train, valid = train_test_split(train, test_size=.1, random_state=34) # train有80907筆，valid有8990筆
+        return (train, valid, test)
+
 
     def main(self):
         # with open('../yahoo_knowledge_data/crawler_result.json') as rf:
@@ -227,16 +235,24 @@ class preprocessing(object):
         data = self.convert_UNK(word_count, data) # 轉換UNK
 
         # # sample東西出來看
-        # data = random.sample(data, 50)
-        # pprint(data)
+        # data = random.sample(data, 100)
 
-        word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
+        # word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
         # print(len(word_count)) # 最後版本的vocab是53107個字
 
-        # 產生vocab
-        gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab')
+        # # 產生vocab
+        # gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab')
+        
+        train, valid, test = self.split_train_valid(data) # 回傳(train, valid, test)
         # 產生data_convert_example.py可以吃的格式的資料
-        self.gen_input_format(data, '../yahoo_knowledge_data/data_ready')
+        self.gen_input_format(train, '../yahoo_knowledge_data/train/readable_data_ready')
+        self.gen_input_format(valid, '../yahoo_knowledge_data/valid/readable_data_ready')
+        self.gen_input_format(test, '../yahoo_knowledge_data/decode/readable_data_ready')
+        text_to_binary('../yahoo_knowledge_data/train/readable_data_ready', '../yahoo_knowledge_data/train/data')
+        text_to_binary('../yahoo_knowledge_data/valid/readable_data_ready', '../yahoo_knowledge_data/valid/data')
+        text_to_binary('../yahoo_knowledge_data/decode/readable_data_ready', '../yahoo_knowledge_data/decode/data')
+
+
 
 
 if __name__ == '__main__':
