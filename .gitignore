@@ -26,6 +26,9 @@ google_search_crawler/result.json
 yahoo_knowledge_data/
 yahoo_log_root_1/
 yahoo_log_root_2/
+eval_log
+google_search_crawler/raw_data.json
+train_log
 
 
 

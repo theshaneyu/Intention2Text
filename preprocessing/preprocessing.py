@@ -4,7 +4,7 @@ import jieba
 import json
 import re
 import random
-from progress.bar import IncrementalBar # 顯示進度條
+from tqdm import tqdm
 from gen_vocab import gen_vocab
 from sklearn.model_selection import train_test_split
 from data_convert_example import text_to_binary
@@ -201,34 +201,32 @@ class preprocessing(object):
 
 
     def main(self):
-        # with open('../yahoo_knowledge_data/crawler_result.json') as rf:
-        #     data = json.load(rf) # 90148筆
+        with open('../yahoo_knowledge_data/corpus/ver_2/init_data.json') as rf:
+            data = json.load(rf)
         
         # # sample東西出來看
-        # # data = random.sample(data, 50)
+        # data = random.sample(data, 50)
 
-        # bar = IncrementalBar('Processing', max=90148)
-        # out_list = []
-        # for item in data:
-        #     out_dict = {}
-        #     context = self.go_through_processes_for_context(item['context'])
-        #     discription = self.go_through_processes_for_discription(item['discription'])
-        #     if context and discription: # 共有152個錯誤
-        #         out_dict['context'] = context
-        #         out_dict['discription'] = discription
-        #         out_list.append(out_dict)
-        #     bar.next()
+        out_list = []
+        for item in tqdm(data):
+            out_dict = {}
+            context = self.go_through_processes_for_context(item['context'])
+            discription = self.go_through_processes_for_discription(item['discription'])
+            if context and discription:
+                out_dict['context'] = context
+                out_dict['discription'] = discription
+                out_list.append(out_dict)
 
-        # with open('../yahoo_knowledge_data/preprocessed_result.json', 'w') as wf:
-        #     json.dump(out_list, wf)
+        with open('../yahoo_knowledge_data/corpus/ver_2/preprocessed_data.json', 'w') as wf:
+            json.dump(out_list, wf)
 
         
         """
         以上做完前處理，為了加速所以先存檔，接著下來用讀檔的比較快。之後也可以串起來一次做完。
         """
-
-        with open('../yahoo_knowledge_data/preprocessed_result.json', 'r') as rf:
-            data = json.load(rf) # 剩下89996筆
+        data = out_list
+        # with open('../yahoo_knowledge_data/preprocessed_result.json', 'r') as rf:
+        #     data = json.load(rf)
 
         gen = gen_vocab()
         word_count = gen.get_word_count_with_threshold(data, 53106) # 用來轉換UNK的counter
@@ -237,8 +235,8 @@ class preprocessing(object):
         # # sample東西出來看
         # data = random.sample(data, 100)
 
-        # word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
-        # print(len(word_count)) # 最後版本的vocab是53107個字
+        word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
+        print(len(word_count)) # 最後版本的vocab是53107個字
 
         # # 產生vocab
         # gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab')

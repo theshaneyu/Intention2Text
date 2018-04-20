@@ -1,21 +1,4 @@
-# Copyright 2016 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
 """Trains a seq2seq model.
-
-WORK IN PROGRESS.
 
 Implement "Abstractive Text Summarization using Sequence-to-sequence RNNS and
 Beyond."
@@ -57,7 +40,7 @@ tf.app.flags.DEFINE_integer('max_abstract_sentences', 100,
                             'abstract')
 tf.app.flags.DEFINE_integer('beam_size', 8,
                             'beam size for beam search decoding.')
-tf.app.flags.DEFINE_integer('eval_interval_secs', 60, 'How often to run eval.')
+tf.app.flags.DEFINE_integer('eval_interval_secs', 5, 'How often to run eval.')
 tf.app.flags.DEFINE_integer('checkpoint_secs', 60, 'How often to checkpoint.')
 tf.app.flags.DEFINE_bool('use_bucketing', False,
                          'Whether bucket articles of similar length.')
@@ -98,7 +81,7 @@ def _Train(model, data_batcher):
                                  save_model_secs=FLAGS.checkpoint_secs,
                                  global_step=model.global_step)
         config = tf.ConfigProto(allow_soft_placement=True)
-        # config.gpu_options.per_process_gpu_memory_fraction = .5 # 指定GPU記憶體只吃一半
+        config.gpu_options.per_process_gpu_memory_fraction = .5 # 指定GPU記憶體只吃一半
         sess = sv.prepare_or_wait_for_session(config=config)
         running_avg_loss = 0
         step = 0
@@ -215,11 +198,5 @@ def main(unused_argv):
 
 
 if __name__ == '__main__':
-    from time import time
-    start = time()
-    
     tf.app.run()
-    
-    end = time()
     wf.close()
-    print('執行共花費', (end - start), '秒')
