@@ -158,8 +158,6 @@ class preprocessing(object):
                 wf.write('context=' + item['context'])
                 wf.write('\n')
 
-
-
     def go_through_processes_for_context(self, data):
         """走過context的所有清理步驟
         輸入：欲處理的字串
@@ -195,60 +193,68 @@ class preprocessing(object):
 
     def split_train_valid(self, data):
         # 切割train, valid, test資料
-        train, test = train_test_split(data, test_size=.0011, random_state=34) # 抽99筆出來當testing data
-        train, valid = train_test_split(train, test_size=.1, random_state=34) # train有80907筆，valid有8990筆
+        train, test = train_test_split(data, test_size=.0001, random_state=34) # 抽99筆出來當testing data
+        train, valid = train_test_split(train, test_size=.2, random_state=34) # train有80907筆，valid有8990筆
         return (train, valid, test)
 
 
+
     def main(self):
-        with open('../yahoo_knowledge_data/corpus/ver_2/init_data.json') as rf:
-            data = json.load(rf)
+        # with open('../yahoo_knowledge_data/corpus/ver_2/init_data.json') as rf:
+        #     data = json.load(rf)
         
-        # # sample東西出來看
-        # data = random.sample(data, 50)
+        # # # sample東西出來看
+        # # data = random.sample(data, 50)
 
-        out_list = []
-        for item in tqdm(data):
-            out_dict = {}
-            context = self.go_through_processes_for_context(item['context'])
-            discription = self.go_through_processes_for_discription(item['discription'])
-            if context and discription:
-                out_dict['context'] = context
-                out_dict['discription'] = discription
-                out_list.append(out_dict)
+        # err = 0
+        # out_list = []
+        # for item in tqdm(data):
+        #     out_dict = {}
+        #     context = self.go_through_processes_for_context(item['context'])
+        #     discription = self.go_through_processes_for_discription(item['discription'])
+        #     if context and discription:
+        #         out_dict['context'] = context
+        #         out_dict['discription'] = discription
+        #         out_list.append(out_dict)
+        #     else:
+        #         err += 1
 
-        with open('../yahoo_knowledge_data/corpus/ver_2/preprocessed_data.json', 'w') as wf:
-            json.dump(out_list, wf)
+        # # 全部資料總共 894065 筆
+        # # 無法處理的資料共 1180 筆
+        # with open('../yahoo_knowledge_data/corpus/ver_2/preprocessed_data.json', 'w') as wf:
+        #     json.dump(out_list, wf)
 
         
         """
         以上做完前處理，為了加速所以先存檔，接著下來用讀檔的比較快。之後也可以串起來一次做完。
         """
-        data = out_list
-        # with open('../yahoo_knowledge_data/preprocessed_result.json', 'r') as rf:
-        #     data = json.load(rf)
 
-        gen = gen_vocab()
-        word_count = gen.get_word_count_with_threshold(data, 53106) # 用來轉換UNK的counter
-        data = self.convert_UNK(word_count, data) # 轉換UNK
-
-        # # sample東西出來看
+        with open('../yahoo_knowledge_data/corpus/ver_2/preprocessed_data.json', 'r') as rf:
+            data = json.load(rf)
+        
+        # sample東西出來看
         # data = random.sample(data, 100)
 
-        word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
-        print(len(word_count)) # 最後版本的vocab是53107個字
+        gen = gen_vocab()
+        word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
 
-        # # 產生vocab
-        # gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab')
+        # data = self.convert_UNK(word_count, data) # 轉換UNK
+
+
+        # word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
+        # print(len(word_count)) # 最後版本的vocab是53107個字
+
+        # # # 產生vocab
+        # # gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab')
         
-        train, valid, test = self.split_train_valid(data) # 回傳(train, valid, test)
-        # 產生data_convert_example.py可以吃的格式的資料
-        self.gen_input_format(train, '../yahoo_knowledge_data/train/readable_data_ready')
-        self.gen_input_format(valid, '../yahoo_knowledge_data/valid/readable_data_ready')
-        self.gen_input_format(test, '../yahoo_knowledge_data/decode/readable_data_ready')
-        text_to_binary('../yahoo_knowledge_data/train/readable_data_ready', '../yahoo_knowledge_data/train/data')
-        text_to_binary('../yahoo_knowledge_data/valid/readable_data_ready', '../yahoo_knowledge_data/valid/data')
-        text_to_binary('../yahoo_knowledge_data/decode/readable_data_ready', '../yahoo_knowledge_data/decode/data')
+        # train, valid, test = self.split_train_valid(data) # 回傳(train, valid, test)
+        # # 產生data_convert_example.py可以吃的格式的資料
+        # self.gen_input_format(train, '../yahoo_knowledge_data/train/readable_data_ready')
+        # self.gen_input_format(valid, '../yahoo_knowledge_data/valid/readable_data_ready')
+        # self.gen_input_format(test, '../yahoo_knowledge_data/decode/readable_data_ready')
+        # text_to_binary('../yahoo_knowledge_data/train/readable_data_ready', '../yahoo_knowledge_data/train/data')
+        # text_to_binary('../yahoo_knowledge_data/valid/readable_data_ready', '../yahoo_knowledge_data/valid/data')
+        # text_to_binary('../yahoo_knowledge_data/decode/readable_data_ready', '../yahoo_knowledge_data/decode/data')
 
 
 

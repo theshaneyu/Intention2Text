@@ -1,23 +1,13 @@
 import json
 from collections import Counter
 from operator import itemgetter
+from tqdm import tqdm
+
 
 class gen_vocab(object):
     """用於產生vocab"""
     def __init__(self):
         pass
-
-    def gen_all_words_vocab(self, cnt):
-        """產生所有詞的詞頻"""
-        with open('./all_vocab', 'w') as wf:
-            for pair in sorted(cnt.items(), key=itemgetter(1), reverse=True):
-                wf.write(pair[0] + ' ' + str(pair[1]) + '\n')
-
-    def gen_vocab_before_UNK(self, cnt):
-        """由全部的文本產生前400000的vocab，可以用此vocab來標記<UNK>標籤"""
-        with open('./vocab_before_UNK', 'w') as wf:
-            for pair in cnt.most_common(400000):
-                wf.write(pair[0] + ' ' + str(pair[1]) + '\n')
 
     def gen_final_vocab(self, cnt, out_path):
         """產生正式的vocab"""
@@ -25,27 +15,55 @@ class gen_vocab(object):
             for pair in cnt:
                 wf.write(pair[0] + ' ' + str(pair[1]) + '\n')
             wf.write('<PAD> 0')
+
+    def _filter_words_with_threshold(self, ordered_itemized_cnt, threshold):
+        """
+        returns:
+            1. 根據門檻值過濾完的itemized_cnt
+            2. 順便回傳「UNK總共會出現多少次」
+        """
+        return_list = []
+        UNK_appear_time = 0
+        for item in ordered_itemized_cnt:
+            if item[1] > threshold:
+                return_list.append(item)
+            else:
+                UNK_appear_time += item[1]
+        return return_list, UNK_appear_time
         
-    def get_word_count_with_threshold(self, data, th):
-        """回傳word count的Counter，前k高的字，如果th=0，則不設門檻單純回傳word count
+    def get_word_count_with_threshold(self, data, threshold, top_k=0):
+        """
+        args:
+            data: 輸入json格式data
+            top_k: 如果要取「word_count排名前幾的詞」，則輸入數值，預設不取排名，數值為0
+            threshold: 只取word_count數值為多少以上的詞，如果為0，則回傳完整word_count
+        return:
+            cnt的items格式
 
         """
         cnt = Counter()
 
-        count = 0
-        for item in data:
+        word_count = 0
+        for item in tqdm(data):
             for key in item.keys(): # abstrct and article
                 for word in item[key].split():
                     if word == ' ':
                         continue
                     cnt[word] += 1
-            count += 1
-            if count % 10000 == 0:
-                print('word count已算完 %d 筆' % count)
-        if th == 0:
-            return sorted(cnt.items(), key=itemgetter(1), reverse=True)
+                    word_count += 1
+        print('===== 全部文章總詞數', '{:,}'.format(word_count), '=====')
+        print('===== 全部文章詞種類數（字典大小）', '{:,}'.format(len(cnt)), '=====')
+        if top_k == 0:
+            if threshold == 0:
+                return sorted(cnt.items(), key=itemgetter(1), reverse=True)
+            else:
+                sorted_cnt = sorted(cnt.items(), key=itemgetter(1), reverse=True)
+                filtered_list, UNK_appear_time = self._filter_words_with_threshold(sorted_cnt, threshold)
+                print('如果門檻設', threshold, '則有', '{:,}'.format(UNK_appear_time), '個字會變 <UNK>')
+                print('且詞種類數（字典大小）會變', '{:,}'.format(len(filtered_list)))
+                return filtered_list
         else:
-            return cnt.most_common(th)
+            return cnt.most_common(top_k)
 
     def main(self):
         cnt = self.get_word_count_with_threshold('corpus_converted_num_and_UNK_4.json')
@@ -53,6 +71,7 @@ class gen_vocab(object):
 
 
 def checking(self, threshold):
+    """測試用function"""
     greater = 0
     smaller = 0
     with open('./vocab', 'r') as rf:
