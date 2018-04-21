@@ -124,6 +124,28 @@ class preprocessing(object):
         """加上<p>標籤和<d>標籤"""
         return '<d> <p> ' + paragraph + '</p> </d>'
 
+    def filter_specific_word(self, data):
+        """專門過濾掉discription中有「這」的資料"""
+        result_list = []
+        for item in data:
+            found = False
+            for ch in item['discription']:
+                if ch == '這':
+                    found = True
+                    break
+            if not found:
+                result_list.append(item)
+        return result_list
+
+    def _sample_data_to_see(self, data, num):
+        # sample東西出來看
+        for item in random.sample(data, num):
+            print('[discription]')
+            print(item['discription'])
+            print('[context]')
+            print(item['context'])
+            print('-----------------------------------------------------')
+
     def convert_UNK(self, word_count, data):
         word_pool = self._gen_word_pool(word_count)
         out_list = []
@@ -191,10 +213,14 @@ class preprocessing(object):
         except:
             return
 
-    def split_train_valid(self, data):
-        # 切割train, valid, test資料
-        train, test = train_test_split(data, test_size=.0001, random_state=34) # 抽99筆出來當testing data
-        train, valid = train_test_split(train, test_size=.2, random_state=34) # train有80907筆，valid有8990筆
+    def split_train_valid(self, data, test_size, valid_size):
+        """
+        切割train, valid, test資料
+        train先切給test
+        剩下的train再切給valid
+        """
+        train, test = train_test_split(data, test_size=test_size, random_state=34) # 抽99筆出來當testing data
+        train, valid = train_test_split(train, test_size=valid_size, random_state=34) # train有80907筆，valid有8990筆
         return (train, valid, test)
 
 
@@ -231,30 +257,37 @@ class preprocessing(object):
 
         with open('../yahoo_knowledge_data/corpus/ver_2/preprocessed_data.json', 'r') as rf:
             data = json.load(rf)
+
+        data = self.filter_specific_word(data)
         
-        # sample東西出來看
-        # data = random.sample(data, 100)
+        # # sample東西出來看
+        # self._sample_data_to_see(data, 100)
 
         gen = gen_vocab()
         word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
 
-        # data = self.convert_UNK(word_count, data) # 轉換UNK
+        print('==== 開始轉換<UNK> ====')
+        data = self.convert_UNK(word_count, data) # 轉換UNK
 
 
-        # word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
-        # print(len(word_count)) # 最後版本的vocab是53107個字
+        word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
+        print('最後版本的vocab是', len(word_count), '個字')
 
-        # # # 產生vocab
-        # # gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab')
+        # 產生vocab
+        gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_2/vocab')
         
-        # train, valid, test = self.split_train_valid(data) # 回傳(train, valid, test)
-        # # 產生data_convert_example.py可以吃的格式的資料
-        # self.gen_input_format(train, '../yahoo_knowledge_data/train/readable_data_ready')
-        # self.gen_input_format(valid, '../yahoo_knowledge_data/valid/readable_data_ready')
-        # self.gen_input_format(test, '../yahoo_knowledge_data/decode/readable_data_ready')
-        # text_to_binary('../yahoo_knowledge_data/train/readable_data_ready', '../yahoo_knowledge_data/train/data')
-        # text_to_binary('../yahoo_knowledge_data/valid/readable_data_ready', '../yahoo_knowledge_data/valid/data')
-        # text_to_binary('../yahoo_knowledge_data/decode/readable_data_ready', '../yahoo_knowledge_data/decode/data')
+        train, valid, test = self.split_train_valid(data, test_size=.0001, valid_size=.1) # 回傳(train, valid, test)
+        print('train size', len(train))
+        print('valid size', len(valid))
+        print('test size', len(test))
+
+        # 產生data_convert_example.py可以吃的格式的資料
+        self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_2/readable_data_ready')
+        self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_2/readable_data_ready')
+        self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_2/readable_data_ready')
+        text_to_binary('../yahoo_knowledge_data/train/ver_2/readable_data_ready', '../yahoo_knowledge_data/train/ver_2/data')
+        text_to_binary('../yahoo_knowledge_data/valid/ver_2/readable_data_ready', '../yahoo_knowledge_data/valid/ver_2/data')
+        text_to_binary('../yahoo_knowledge_data/decode/ver_2/readable_data_ready', '../yahoo_knowledge_data/decode/ver_2/data')
 
 
 

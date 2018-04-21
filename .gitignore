@@ -29,6 +29,7 @@ yahoo_log_root_2/
 eval_log
 google_search_crawler/raw_data.json
 train_log
+textsum/yahoo_log_root_ver_2/
 
 
 
