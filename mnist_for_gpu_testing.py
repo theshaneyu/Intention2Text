@@ -13,6 +13,8 @@ from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
+import subprocess
+
 SOURCE_URL = 'http://yann.lecun.com/exdb/mnist/'
 WORK_DIRECTORY = 'data'
 IMAGE_SIZE = 28
@@ -299,6 +301,7 @@ def main(_):
             print('test_error', test_error)
             assert test_error == 0.0, 'expected 0.0 test_error, got %.2f' % (
                     test_error,)
+    subprocess.run(['rm', '-rf', './data/'])
 
 
 if __name__ == '__main__':
