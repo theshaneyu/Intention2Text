@@ -3,7 +3,7 @@ bazel-bin
 bazel-genfiles
 bazel-out
 bazel-testlogs
-bazel-textsum_demo
+bazel-behavior2text
 nohup.out
 venv_*
 textsum/bazel-*
