@@ -55,6 +55,8 @@ class DecodeIO(object):
             reference: The human (correct) result.
             decode: The machine-generated result
         """
+        print('正確結果：', reference)
+        print('模型輸出結果', decode)
         self._ref_file.write('output=%s\n' % reference)
         self._decode_file.write('output=%s\n' % decode)
         self._cnt += 1
