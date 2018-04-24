@@ -38,9 +38,9 @@ tf.app.flags.DEFINE_integer('max_article_sentences', 2,
 tf.app.flags.DEFINE_integer('max_abstract_sentences', 100,
                             'Max number of first sentences to use from the '
                             'abstract')
-tf.app.flags.DEFINE_integer('beam_size', 8,
+tf.app.flags.DEFINE_integer('beam_size', 4,
                             'beam size for beam search decoding.')
-tf.app.flags.DEFINE_integer('eval_interval_secs', 5, 'How often to run eval.')
+tf.app.flags.DEFINE_integer('eval_interval_secs', 7, 'How often to run eval.')
 tf.app.flags.DEFINE_integer('checkpoint_secs', 60, 'How often to checkpoint.')
 tf.app.flags.DEFINE_bool('use_bucketing', False,
                          'Whether bucket articles of similar length.')
@@ -81,7 +81,7 @@ def _Train(model, data_batcher):
                                  save_model_secs=FLAGS.checkpoint_secs,
                                  global_step=model.global_step)
         config = tf.ConfigProto(allow_soft_placement=True)
-        # config.gpu_options.per_process_gpu_memory_fraction = .5 # 指定GPU記憶體只吃一半
+        config.gpu_options.per_process_gpu_memory_fraction = .5 # 指定GPU記憶體只吃一半
         sess = sv.prepare_or_wait_for_session(config=config)
         running_avg_loss = 0
         step = 0
@@ -162,11 +162,11 @@ def main(unused_argv):
                         min_lr=0.01,  # min learning rate.
                         lr=0.15,  # learning rate
                         batch_size=batch_size,
-                        enc_layers=2,
+                        enc_layers=4,
                         enc_timesteps=120,
                         dec_timesteps=30,
                         min_input_len=2,  # discard articles/summaries < than this
-                        num_hidden=128,  # for rnn cell
+                        num_hidden=256,  # for rnn cell
                         emb_dim=128,  # If 0, don't use embedding
                         max_grad_norm=2,
                         num_softmax_samples=4096)  # If 0, no sampled softmax.

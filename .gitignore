@@ -5,9 +5,6 @@ bazel-out
 bazel-testlogs
 bazel-behavior2text
 nohup.out
-venv_*
-textsum/bazel-*
-textsum/log_root/*
 *.gz
 running_log.txt
 log_root*
@@ -26,10 +23,11 @@ google_search_crawler/result.json
 yahoo_knowledge_data/
 yahoo_log_root_1/
 yahoo_log_root_2/
-eval_log
 google_search_crawler/raw_data.json
-train_log
 textsum/yahoo_log_root_ver_2/
+seq2seq/log/
+eval_log*
+train_log*
 
 
 
