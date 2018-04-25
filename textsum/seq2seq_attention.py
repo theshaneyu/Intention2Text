@@ -87,8 +87,10 @@ def _Train(model, data_batcher):
                                  save_summaries_secs=60,
                                  save_model_secs=FLAGS.checkpoint_secs,
                                  global_step=model.global_step)
+        
         config = tf.ConfigProto(allow_soft_placement=True)
         config.gpu_options.per_process_gpu_memory_fraction = .3 # 指定GPU記憶體只吃一半
+        
         sess = sv.prepare_or_wait_for_session(config=config)
         running_avg_loss = 0
         step = 0
@@ -118,6 +120,7 @@ def _Eval(model, data_batcher, vocab=None):
     
     config = tf.ConfigProto(allow_soft_placement=True)
     config.gpu_options.per_process_gpu_memory_fraction = .3 # 指定GPU記憶體只吃一半
+    
     sess = tf.Session(config=config)
     running_avg_loss = 0
     step = 0

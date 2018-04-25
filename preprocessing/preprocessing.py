@@ -26,8 +26,8 @@ class preprocessing(object):
     def remove_and_convert_character(self, string):
         """功能：1) 只保留中文、逗點、句點、數字 2) 空格、半形逗點轉成逗點 3) 數字轉成#
                 4) 清除連續的逗點、句點和#
-        輸入：字串
-        輸出：處理好的字串
+        args: 字串
+        returns: 處理好的字串
         """
         clean_str = ''
         dirty_str = ''
@@ -182,8 +182,8 @@ class preprocessing(object):
 
     def go_through_processes_for_context(self, data):
         """走過context的所有清理步驟
-        輸入：欲處理的字串
-        輸出：處理好的字串
+        args: 欲處理的字串
+        returns: 處理好的字串
         """
         try:
             # 刪除context開頭的日期字串
