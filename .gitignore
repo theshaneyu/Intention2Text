@@ -28,6 +28,7 @@ textsum/yahoo_log_root_ver_2/
 seq2seq/log/
 eval_log*
 train_log*
+textsum/log/
 
 
 

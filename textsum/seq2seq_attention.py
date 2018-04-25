@@ -4,6 +4,13 @@ Implement "Abstractive Text Summarization using Sequence-to-sequence RNNS and
 Beyond."
 
 """
+"""
+每次更改要注意的參數：
+CUDA_VISIBLE_DEVICES
+eval_interval_secs
+per_process_gpu_memory_fraction
+模型參數區
+"""
 import sys
 import time
 
@@ -21,9 +28,9 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('data_path', '', 'Path expression to tf.Example.')
 tf.app.flags.DEFINE_string('vocab_path',
                            '', 'Path expression to text vocabulary file.')
-tf.app.flags.DEFINE_string('article_key', 'article',
+tf.app.flags.DEFINE_string('article_key', 'context',
                            'tf.Example feature key for article.')
-tf.app.flags.DEFINE_string('abstract_key', 'headline',
+tf.app.flags.DEFINE_string('abstract_key', 'discription',
                            'tf.Example feature key for abstract.')
 tf.app.flags.DEFINE_string('log_root', '', 'Directory for model root.')
 tf.app.flags.DEFINE_string('train_dir', '', 'Directory for train.')
@@ -40,7 +47,7 @@ tf.app.flags.DEFINE_integer('max_abstract_sentences', 100,
                             'abstract')
 tf.app.flags.DEFINE_integer('beam_size', 4,
                             'beam size for beam search decoding.')
-tf.app.flags.DEFINE_integer('eval_interval_secs', 7, 'How often to run eval.')
+tf.app.flags.DEFINE_integer('eval_interval_secs', 5, 'How often to run eval.')
 tf.app.flags.DEFINE_integer('checkpoint_secs', 60, 'How often to checkpoint.')
 tf.app.flags.DEFINE_bool('use_bucketing', False,
                          'Whether bucket articles of similar length.')
@@ -81,7 +88,7 @@ def _Train(model, data_batcher):
                                  save_model_secs=FLAGS.checkpoint_secs,
                                  global_step=model.global_step)
         config = tf.ConfigProto(allow_soft_placement=True)
-        config.gpu_options.per_process_gpu_memory_fraction = .5 # 指定GPU記憶體只吃一半
+        config.gpu_options.per_process_gpu_memory_fraction = .3 # 指定GPU記憶體只吃一半
         sess = sv.prepare_or_wait_for_session(config=config)
         running_avg_loss = 0
         step = 0
@@ -108,7 +115,10 @@ def _Eval(model, data_batcher, vocab=None):
     model.build_graph()
     saver = tf.train.Saver()
     summary_writer = tf.summary.FileWriter(FLAGS.eval_dir)
-    sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+    
+    config = tf.ConfigProto(allow_soft_placement=True)
+    config.gpu_options.per_process_gpu_memory_fraction = .3 # 指定GPU記憶體只吃一半
+    sess = tf.Session(config=config)
     running_avg_loss = 0
     step = 0
     while True:
@@ -159,15 +169,15 @@ def main(unused_argv):
 
     hps = seq2seq_attention_model.HParams(
                         mode=FLAGS.mode,  # train, eval, decode
-                        min_lr=0.01,  # min learning rate.
-                        lr=0.15,  # learning rate
+                        min_lr=0.0001,  # min learning rate.
+                        lr=0.1,  # learning rate
                         batch_size=batch_size,
-                        enc_layers=4,
+                        enc_layers=2,
                         enc_timesteps=120,
                         dec_timesteps=30,
                         min_input_len=2,  # discard articles/summaries < than this
-                        num_hidden=256,  # for rnn cell
-                        emb_dim=128,  # If 0, don't use embedding
+                        num_hidden=128,  # for rnn cell
+                        emb_dim=256,  # If 0, don't use embedding
                         max_grad_norm=2,
                         num_softmax_samples=4096)  # If 0, no sampled softmax.
 
