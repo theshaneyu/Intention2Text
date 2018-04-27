@@ -15,6 +15,7 @@ import tensorflow as tf
 
 import subprocess
 
+
 SOURCE_URL = 'http://yann.lecun.com/exdb/mnist/'
 WORK_DIRECTORY = 'data'
 IMAGE_SIZE = 28
