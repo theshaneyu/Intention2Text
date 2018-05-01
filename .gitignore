@@ -6,7 +6,6 @@ bazel-testlogs
 bazel-behavior2text
 nohup.out
 *.gz
-running_log.txt
 log_root*
 preprocessing/backup
 preprocessing/corpus
