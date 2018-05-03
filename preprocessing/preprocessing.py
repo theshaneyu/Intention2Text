@@ -26,8 +26,8 @@ class preprocessing(object):
     def remove_and_convert_character(self, string):
         """功能：1) 只保留中文、逗點、句點、數字 2) 空格、半形逗點轉成逗點 3) 數字轉成#
                 4) 清除連續的逗點、句點和#
-        輸入：字串
-        輸出：處理好的字串
+        args: 字串
+        returns: 處理好的字串
         """
         clean_str = ''
         dirty_str = ''
@@ -182,8 +182,8 @@ class preprocessing(object):
 
     def go_through_processes_for_context(self, data):
         """走過context的所有清理步驟
-        輸入：欲處理的字串
-        輸出：處理好的字串
+        args: 欲處理的字串
+        returns: 處理好的字串
         """
         try:
             # 刪除context開頭的日期字串
@@ -274,20 +274,20 @@ class preprocessing(object):
         print('最後版本的vocab是', len(word_count), '個字')
 
         # 產生vocab
-        gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_2/vocab')
+        gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_3/vocab')
         
-        train, valid, test = self.split_train_valid(data, test_size=.0001, valid_size=.1) # 回傳(train, valid, test)
+        train, valid, test = self.split_train_valid(data, test_size=.0001, valid_size=.2) # 回傳(train, valid, test)
         print('train size', len(train))
         print('valid size', len(valid))
         print('test size', len(test))
 
         # 產生data_convert_example.py可以吃的格式的資料
-        self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_2/readable_data_ready')
-        self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_2/readable_data_ready')
-        self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_2/readable_data_ready')
-        text_to_binary('../yahoo_knowledge_data/train/ver_2/readable_data_ready', '../yahoo_knowledge_data/train/ver_2/data')
-        text_to_binary('../yahoo_knowledge_data/valid/ver_2/readable_data_ready', '../yahoo_knowledge_data/valid/ver_2/data')
-        text_to_binary('../yahoo_knowledge_data/decode/ver_2/readable_data_ready', '../yahoo_knowledge_data/decode/ver_2/data')
+        self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_3/readable_data_ready')
+        self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_3/readable_data_ready')
+        self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_3/readable_data_ready')
+        text_to_binary('../yahoo_knowledge_data/train/ver_3/readable_data_ready', '../yahoo_knowledge_data/train/ver_3/data')
+        text_to_binary('../yahoo_knowledge_data/valid/ver_3/readable_data_ready', '../yahoo_knowledge_data/valid/ver_3/data')
+        text_to_binary('../yahoo_knowledge_data/decode/ver_3/readable_data_ready', '../yahoo_knowledge_data/decode/ver_3/data')
 
 
 

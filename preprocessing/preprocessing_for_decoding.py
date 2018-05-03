@@ -1,10 +1,12 @@
 from pprint import pprint
 from opencc import OpenCC 
-import jieba
+# import jieba
 import json
 import re
 import random
 from data_convert_example import text_to_binary
+from tqdm import tqdm
+from glob import glob
 
 
 lock = True
@@ -13,8 +15,8 @@ class preprocessing(object):
     """docstring for preprocessing"""
     def __init__(self, vocab_path):
         # jieba custom setting.
-        jieba.initialize('jieba_dict/dict.txt.big')
-        jieba.load_userdict('jieba_dict/NameDict_Ch_v2')
+        # jieba.initialize('jieba_dict/dict.txt.big')
+        # jieba.load_userdict('jieba_dict/NameDict_Ch_v2')
         self.vocab_path = vocab_path
 
     def remove_date_at_beginning_of_context(self, data):
@@ -209,7 +211,6 @@ class preprocessing(object):
             break
         return output_list
 
-
     def main(self):
         """
         這支程式用來產生decoding用的資料，可以在下方data更改輸入字串，會自動產生模型可以吃的input資料
@@ -237,7 +238,22 @@ class preprocessing(object):
         # 產生input可以吃的資料格式
         text_to_binary('../yahoo_knowledge_data/decode/data_ready', '../yahoo_knowledge_data/decode/data')
 
+def split_decode_data():
+    file_num = 1
+    with open('../yahoo_knowledge_data/decode/ver_2/readable_data_ready') as rf:
+        for line in rf:
+            with open('../yahoo_knowledge_data/decode/ver_2/dataset_ready/data_ready_' + str(file_num), 'w') as wf:
+                wf.write(line.replace('\n', ''))
+            file_num += 1
+    file_num = 1
+    for item in glob('../yahoo_knowledge_data/decode/ver_2/dataset_ready/*'):
+        text_to_binary(item, '../yahoo_knowledge_data/decode/ver_2/dataset_input/data_' + str(file_num))
+        file_num += 1
+
 
 if __name__ == '__main__':
-    p = preprocessing('../yahoo_knowledge_data/vocab')
-    p.main()
+    # p = preprocessing('../yahoo_knowledge_data/vocab')
+    # p.main()
+
+    split_decode_data()
+
