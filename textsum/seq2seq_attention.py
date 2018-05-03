@@ -1,9 +1,7 @@
 """Trains a seq2seq model.
-
-Implement "Abstractive Text Summarization using Sequence-to-sequence RNNS and
-Beyond."
-
+實作 "Abstractive Text Summarization using Sequence-to-sequence RNNS and Beyond."
 """
+
 """
 每次更改要注意的參數：
 CUDA_VISIBLE_DEVICES
@@ -21,7 +19,7 @@ import seq2seq_attention_decode
 import seq2seq_attention_model
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '1' # 指定使用某顆GPU跑
+os.environ["CUDA_VISIBLE_DEVICES"] = '0' # 指定使用某顆GPU跑
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -30,7 +28,7 @@ tf.app.flags.DEFINE_string('vocab_path',
                            '', 'Path expression to text vocabulary file.')
 tf.app.flags.DEFINE_string('article_key', 'context',
                            'tf.Example feature key for article.')
-tf.app.flags.DEFINE_string('abstract_key', 'discription',
+tf.app.flags.DEFINE_string('abstract_key', 'description',
                            'tf.Example feature key for abstract.')
 tf.app.flags.DEFINE_string('log_root', '', 'Directory for model root.')
 tf.app.flags.DEFINE_string('train_dir', '', 'Directory for train.')
@@ -89,7 +87,7 @@ def _Train(model, data_batcher):
                                  global_step=model.global_step)
         
         config = tf.ConfigProto(allow_soft_placement=True)
-        config.gpu_options.per_process_gpu_memory_fraction = .3 # 指定GPU記憶體只吃一半
+        config.gpu_options.per_process_gpu_memory_fraction = .5 # 指定GPU記憶體只吃一半
         
         sess = sv.prepare_or_wait_for_session(config=config)
         running_avg_loss = 0
@@ -119,7 +117,7 @@ def _Eval(model, data_batcher, vocab=None):
     summary_writer = tf.summary.FileWriter(FLAGS.eval_dir)
     
     config = tf.ConfigProto(allow_soft_placement=True)
-    config.gpu_options.per_process_gpu_memory_fraction = .3 # 指定GPU記憶體只吃一半
+    config.gpu_options.per_process_gpu_memory_fraction = .5 # 指定GPU記憶體只吃一半
     
     sess = tf.Session(config=config)
     running_avg_loss = 0
@@ -179,7 +177,7 @@ def main(unused_argv):
                         enc_timesteps=120,
                         dec_timesteps=30,
                         min_input_len=2,  # discard articles/summaries < than this
-                        num_hidden=128,  # for rnn cell
+                        num_hidden=256,  # for rnn cell
                         emb_dim=256,  # If 0, don't use embedding
                         max_grad_norm=2,
                         num_softmax_samples=4096)  # If 0, no sampled softmax.

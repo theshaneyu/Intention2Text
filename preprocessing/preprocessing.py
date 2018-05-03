@@ -125,11 +125,13 @@ class preprocessing(object):
         return '<d> <p> ' + paragraph + '</p> </d>'
 
     def filter_specific_word(self, data):
-        """專門過濾掉discription中有「這」的資料"""
+        """專門過濾掉一些含有特定關鍵字的item
+        - descripttion當中有「這」
+        """
         result_list = []
         for item in data:
             found = False
-            for ch in item['discription']:
+            for ch in item['description']:
                 if ch == '這':
                     found = True
                     break
@@ -140,8 +142,8 @@ class preprocessing(object):
     def _sample_data_to_see(self, data, num):
         # sample東西出來看
         for item in random.sample(data, num):
-            print('[discription]')
-            print(item['discription'])
+            print('[description]')
+            print(item['description'])
             print('[context]')
             print(item['context'])
             print('-----------------------------------------------------')
@@ -152,7 +154,7 @@ class preprocessing(object):
         for item in data:
             out_dict = {}
             out_dict['context'] = self._convert_UNK_for_one_string(item['context'], word_pool)
-            out_dict['discription'] = self._convert_UNK_for_one_string(item['discription'], word_pool)
+            out_dict['description'] = self._convert_UNK_for_one_string(item['description'], word_pool)
             out_list.append(out_dict)
         return out_list
 
@@ -175,7 +177,7 @@ class preprocessing(object):
         """產生data_convert_example.py可以吃的檔案"""
         with open(out_path, 'w') as wf:
             for item in data:
-                wf.write('discription=' + item['discription'])
+                wf.write('description=' + item['description'])
                 wf.write('\t')
                 wf.write('context=' + item['context'])
                 wf.write('\n')
@@ -202,7 +204,7 @@ class preprocessing(object):
         except:
             return
 
-    def go_through_processes_for_discription(self, data):
+    def go_through_processes_for_description(self, data):
         try:
             data = self.remove_and_convert_character(data)
             data = self.remove_comma_at_head_and_tail(data)
@@ -224,7 +226,6 @@ class preprocessing(object):
         return (train, valid, test)
 
 
-
     def main(self):
         # with open('../yahoo_knowledge_data/corpus/ver_2/init_data.json') as rf:
         #     data = json.load(rf)
@@ -237,10 +238,10 @@ class preprocessing(object):
         # for item in tqdm(data):
         #     out_dict = {}
         #     context = self.go_through_processes_for_context(item['context'])
-        #     discription = self.go_through_processes_for_discription(item['discription'])
-        #     if context and discription:
+        #     description = self.go_through_processes_for_description(item['description'])
+        #     if context and description:
         #         out_dict['context'] = context
-        #         out_dict['discription'] = discription
+        #         out_dict['description'] = description
         #         out_list.append(out_dict)
         #     else:
         #         err += 1
@@ -263,33 +264,31 @@ class preprocessing(object):
         # # sample東西出來看
         # self._sample_data_to_see(data, 100)
 
-        gen = gen_vocab()
-        word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
+        # gen = gen_vocab()
+        # word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
 
-        print('==== 開始轉換<UNK> ====')
-        data = self.convert_UNK(word_count, data) # 轉換UNK
+        # print('==== 開始轉換<UNK> ====')
+        # data = self.convert_UNK(word_count, data) # 轉換UNK
 
 
-        word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
-        print('最後版本的vocab是', len(word_count), '個字')
+        # word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
+        # print('最後版本的vocab是', len(word_count), '個字')
 
-        # 產生vocab
-        gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_3/vocab')
+        # # 產生vocab
+        # gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_3/vocab')
         
-        train, valid, test = self.split_train_valid(data, test_size=.0001, valid_size=.2) # 回傳(train, valid, test)
-        print('train size', len(train))
-        print('valid size', len(valid))
-        print('test size', len(test))
+        # train, valid, test = self.split_train_valid(data, test_size=.0001, valid_size=.2) # 回傳(train, valid, test)
+        # print('train size', len(train))
+        # print('valid size', len(valid))
+        # print('test size', len(test))
 
-        # 產生data_convert_example.py可以吃的格式的資料
-        self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_3/readable_data_ready')
-        self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_3/readable_data_ready')
-        self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_3/readable_data_ready')
-        text_to_binary('../yahoo_knowledge_data/train/ver_3/readable_data_ready', '../yahoo_knowledge_data/train/ver_3/data')
-        text_to_binary('../yahoo_knowledge_data/valid/ver_3/readable_data_ready', '../yahoo_knowledge_data/valid/ver_3/data')
-        text_to_binary('../yahoo_knowledge_data/decode/ver_3/readable_data_ready', '../yahoo_knowledge_data/decode/ver_3/data')
-
-
+        # # 產生data_convert_example.py可以吃的格式的資料
+        # self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_3/readable_data_ready')
+        # self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_3/readable_data_ready')
+        # self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_3/readable_data_ready')
+        # text_to_binary('../yahoo_knowledge_data/train/ver_3/readable_data_ready', '../yahoo_knowledge_data/train/ver_3/data')
+        # text_to_binary('../yahoo_knowledge_data/valid/ver_3/readable_data_ready', '../yahoo_knowledge_data/valid/ver_3/data')
+        # text_to_binary('../yahoo_knowledge_data/decode/ver_3/readable_data_ready', '../yahoo_knowledge_data/decode/ver_3/data')
 
 
 if __name__ == '__main__':
