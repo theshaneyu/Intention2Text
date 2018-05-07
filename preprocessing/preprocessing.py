@@ -45,11 +45,11 @@ class preprocessing(object):
                     clean_str += '#'
                 else:
                     dirty_str += ch
-        clean_str = self._remove_sequencial_char(clean_str)
+        clean_str = self._remove_sequential_char(clean_str)
         return clean_str
         
 
-    def _remove_sequencial_char(self, string):
+    def _remove_sequential_char(self, string):
         """專門處理掉一連串的字元，例如逗號、句號、井字號"""
         previous_char = ''
         result_str = ''
