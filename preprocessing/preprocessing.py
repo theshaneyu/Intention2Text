@@ -16,6 +16,7 @@ class preprocessing(object):
     def __init__(self):
         jieba.initialize('jieba_dict/dict.txt.big')
         jieba.load_userdict('jieba_dict/NameDict_Ch_v2')
+        self.global_counter = 0
 
     def remove_date_at_beginning_of_context(self, data):
         """刪除context開頭的日期字串"""
@@ -45,7 +46,6 @@ class preprocessing(object):
                     clean_str += '#'
                 else:
                     dirty_str += ch
-        clean_str = self._remove_asking_for_points(clean_str)
         clean_str = self._remove_sequential_char(clean_str)
         return clean_str
         
@@ -75,12 +75,21 @@ class preprocessing(object):
                 previous_char = c
         return result_str
 
-    def _remove_asking_for_points(self, string):
+    def remove_asking_for_points(self, string):
         """刪除description當中，結尾在求點數的部分"""
         if '急' in string or '#點' in string:
-            return string.replace('急', '').replace('#點', '')
-        else:
-            return string
+            string = string.replace('急', '').replace('#點', '')
+        if '贈' in string:
+            if '贈#' in string:
+                string = string.replace('贈#', '')
+            elif '贈點' in string:
+                string = string.replace('贈點', '')
+            elif '贈送' in string:
+                string = string.replace('贈送', '')
+            else:
+                string = string.replace('贈', '')
+        return string
+        
 
     def remove_comma_at_head_and_tail(self, string):
         """移除頭和尾的逗號"""
@@ -158,6 +167,7 @@ class preprocessing(object):
                     if not found_2:
                         c2 += 1
                         found_2 = True
+                        break
             if found_1 or found_2:
                 continue
             else:
@@ -209,36 +219,37 @@ class preprocessing(object):
                 wf.write('context=' + item['context'])
                 wf.write('\n')
 
-    def go_through_processes_for_context(self, data):
+    def go_through_processes_for_context(self, string):
         """走過context的所有清理步驟
         args: 欲處理的字串
         returns: 處理好的字串
         """
         try:
             # 刪除context開頭的日期字串
-            data = self.remove_date_at_beginning_of_context(data)
+            string = self.remove_date_at_beginning_of_context(string) # context才需要
             # 1) 只保留中文、逗點、句點、數字 2) 空格、半形逗點轉成逗點 3) 數字轉成# 4) 清除連續的逗點、句點和#
-            data = self.remove_and_convert_character(data)
+            string = self.remove_and_convert_character(string)
             # 移除頭和尾的逗號
-            data = self.remove_comma_at_head_and_tail(data)
+            string = self.remove_comma_at_head_and_tail(string)
             # 確定結尾有沒有句號，如果沒有就加上去
-            data = self.check_for_period(data)
+            string = self.check_for_period(string)
             # 斷詞
-            data = self.segmentation(data)
+            string = self.segmentation(string)
             # 加入標籤
-            data = self.insert_tags(data)
-            return data
+            string = self.insert_tags(string)
+            return string
         except:
             return
 
-    def go_through_processes_for_description(self, data):
+    def go_through_processes_for_description(self, string):
         try:
-            data = self.remove_and_convert_character(data)
-            data = self.remove_comma_at_head_and_tail(data)
-            data = self.check_for_period(data)
-            # data = self.segmentation(data)
-            # data = self.insert_tags(data)
-            return data
+            string = self.remove_and_convert_character(string)
+            string = self.remove_asking_for_points(string) # description才需要
+            string = self.remove_comma_at_head_and_tail(string)
+            string = self.check_for_period(string)
+            # string = self.segmentation(string)
+            # string = self.insert_tags(string)
+            return string
         except:
             return
 
@@ -254,51 +265,48 @@ class preprocessing(object):
 
 
     def main(self):
-        with open('../yahoo_knowledge_data/corpus/ver_2/init_data.json') as rf:
-            data = json.load(rf)
+        # with open('../yahoo_knowledge_data/corpus/init_data.json') as rf:
+        #     data = json.load(rf)
         
-        # sample東西出來看
-        data = random.sample(data, 100)
+        # # # sample東西出來看
+        # # data = random.sample(data, 100)
 
-        err = 0
-        out_list = []
-        for item in tqdm(data):
-            out_dict = {}
-            # context = self.go_through_processes_for_context(item['context'])
-            description = self.go_through_processes_for_description(item['description'])
-            
-            print(description)
-            print('==============')
+        # err = 0
+        # out_list = []
+        # for item in tqdm(data):
+        #     out_dict = {}
+        #     context = self.go_through_processes_for_context(item['context'])
+        #     description = self.go_through_processes_for_description(item['description'])
+        #     if context and description:
+        #         out_dict['context'] = context
+        #         out_dict['description'] = description
+        #         out_list.append(out_dict)
+        #     else:
+        #         err += 1
 
-
-
-            # if context and description:
-            #     out_dict['context'] = context
-            #     out_dict['description'] = description
-            #     out_list.append(out_dict)
-            # else:
-            #     err += 1
-
-        # # 全部資料總共 894065 筆
-        # # 無法處理的資料共 1180 筆
-        # with open('../yahoo_knowledge_data/corpus/ver_2/preprocessed_data.json', 'w') as wf:
+        # with open('../yahoo_knowledge_data/corpus/ver_3/preprocessed_data.json', 'w') as wf:
         #     json.dump(out_list, wf)
 
+        # print('全部資料總共', len(data), '筆')
+        # print('前處理清資料總共清掉', err, '筆')    
+        # print('無法處理資料總計', (len(data) - err), '筆')
         
         """
-        以上做完前處理，為了加速所以先存檔，接著下來用讀檔的比較快。之後也可以串起來一次做完。
+        以上做完前處理，為了加速所以先存檔，接著下來用讀檔的比較快，之後也可以串起來一次做完。
         """
-
 
         # =======================================
         # 施工中
 
-        # with open('../yahoo_knowledge_data/corpus/ver_2/preprocessed_data.json', 'r') as rf:
-        #     data = json.load(rf)
+        with open('../yahoo_knowledge_data/corpus/ver_4/preprocessed_data.json', 'r') as rf:
+            data = json.load(rf)
 
-        # print('＝＝＝原本有', len(data), '筆資料＝＝＝')
-        # data = self.filter_specific_word(data)
-        # print('＝＝＝濾完之後只剩', len(data), '筆資料＝＝＝')
+        data_old = data
+        data = self.filter_specific_word(data)
+
+        print('=====原本有', len(data_old), '筆資料=====')
+        print('=====濾完之後只剩', len(data), '筆資料=====')
+        print('總共濾掉', len(data_old) - len(data), '筆資料')
         
         # # sample東西出來看
         # data = self._sample_data_to_see(data, 100)
