@@ -126,17 +126,36 @@ class preprocessing(object):
 
     def filter_specific_word(self, data):
         """專門過濾掉一些含有特定關鍵字的item
-        - descripttion當中有「這」
+        - description當中有「這」
         """
+        c1 = 0
+        c2 = 0
+        c3 = 0
+
         result_list = []
-        for item in data:
-            found = False
-            for ch in item['description']:
+        for item in tqdm(data):
+            found_1 = False
+            found_2 = False
+            for ch in item['description']: # 檢查description
                 if ch == '這':
-                    found = True
+                    found_1 = True
+                    c1 += 1
+                elif ch == '貸':
+                    found_2 = True
+                    c2 += 1
+                if found_1 and found_2:
                     break
-            if not found:
+            for ch in item['context']: # 檢查context
+                if ch == '貸':
+                    if not found_2:
+                        c2 += 1
+                        found_2 = True
+            if found_1 or found_2:
+                continue
+            else:
                 result_list.append(item)
+        print('description中含有「這」', c1)
+        print('description或context中含有「貸」', c2)
         return result_list
 
     def _sample_data_to_see(self, data, num):
@@ -259,11 +278,14 @@ class preprocessing(object):
         with open('../yahoo_knowledge_data/corpus/ver_2/preprocessed_data.json', 'r') as rf:
             data = json.load(rf)
 
+        print('＝＝＝原本有', len(data), '筆資料＝＝＝')
         data = self.filter_specific_word(data)
+        print('＝＝＝濾完之後只剩', len(data), '筆資料＝＝＝')
         
-        # # sample東西出來看
-        # self._sample_data_to_see(data, 100)
-
+        # sample東西出來看
+        data = self._sample_data_to_see(data, 100)
+        pprint(data)
+        
         # gen = gen_vocab()
         # word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
 
