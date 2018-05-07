@@ -45,6 +45,7 @@ class preprocessing(object):
                     clean_str += '#'
                 else:
                     dirty_str += ch
+        clean_str = self._remove_asking_for_points(clean_str)
         clean_str = self._remove_sequential_char(clean_str)
         return clean_str
         
@@ -73,6 +74,13 @@ class preprocessing(object):
                 result_str += c
                 previous_char = c
         return result_str
+
+    def _remove_asking_for_points(self, string):
+        """刪除description當中，結尾在求點數的部分"""
+        if '急' in string or '#點' in string:
+            return string.replace('急', '').replace('#點', '')
+        else:
+            return string
 
     def remove_comma_at_head_and_tail(self, string):
         """移除頭和尾的逗號"""
@@ -126,11 +134,11 @@ class preprocessing(object):
 
     def filter_specific_word(self, data):
         """專門過濾掉一些含有特定關鍵字的item
-        - description當中有「這」
+        - description當中有「這」的item
+        - description或context中含有「貸」的item
         """
         c1 = 0
         c2 = 0
-        c3 = 0
 
         result_list = []
         for item in tqdm(data):
@@ -228,8 +236,8 @@ class preprocessing(object):
             data = self.remove_and_convert_character(data)
             data = self.remove_comma_at_head_and_tail(data)
             data = self.check_for_period(data)
-            data = self.segmentation(data)
-            data = self.insert_tags(data)
+            # data = self.segmentation(data)
+            # data = self.insert_tags(data)
             return data
         except:
             return
@@ -246,24 +254,30 @@ class preprocessing(object):
 
 
     def main(self):
-        # with open('../yahoo_knowledge_data/corpus/ver_2/init_data.json') as rf:
-        #     data = json.load(rf)
+        with open('../yahoo_knowledge_data/corpus/ver_2/init_data.json') as rf:
+            data = json.load(rf)
         
-        # # # sample東西出來看
-        # # data = random.sample(data, 50)
+        # sample東西出來看
+        data = random.sample(data, 100)
 
-        # err = 0
-        # out_list = []
-        # for item in tqdm(data):
-        #     out_dict = {}
-        #     context = self.go_through_processes_for_context(item['context'])
-        #     description = self.go_through_processes_for_description(item['description'])
-        #     if context and description:
-        #         out_dict['context'] = context
-        #         out_dict['description'] = description
-        #         out_list.append(out_dict)
-        #     else:
-        #         err += 1
+        err = 0
+        out_list = []
+        for item in tqdm(data):
+            out_dict = {}
+            # context = self.go_through_processes_for_context(item['context'])
+            description = self.go_through_processes_for_description(item['description'])
+            
+            print(description)
+            print('==============')
+
+
+
+            # if context and description:
+            #     out_dict['context'] = context
+            #     out_dict['description'] = description
+            #     out_list.append(out_dict)
+            # else:
+            #     err += 1
 
         # # 全部資料總共 894065 筆
         # # 無法處理的資料共 1180 筆
@@ -275,16 +289,23 @@ class preprocessing(object):
         以上做完前處理，為了加速所以先存檔，接著下來用讀檔的比較快。之後也可以串起來一次做完。
         """
 
-        with open('../yahoo_knowledge_data/corpus/ver_2/preprocessed_data.json', 'r') as rf:
-            data = json.load(rf)
 
-        print('＝＝＝原本有', len(data), '筆資料＝＝＝')
-        data = self.filter_specific_word(data)
-        print('＝＝＝濾完之後只剩', len(data), '筆資料＝＝＝')
+        # =======================================
+        # 施工中
+
+        # with open('../yahoo_knowledge_data/corpus/ver_2/preprocessed_data.json', 'r') as rf:
+        #     data = json.load(rf)
+
+        # print('＝＝＝原本有', len(data), '筆資料＝＝＝')
+        # data = self.filter_specific_word(data)
+        # print('＝＝＝濾完之後只剩', len(data), '筆資料＝＝＝')
         
-        # sample東西出來看
-        data = self._sample_data_to_see(data, 100)
-        pprint(data)
+        # # sample東西出來看
+        # data = self._sample_data_to_see(data, 100)
+        # pprint(data)
+
+        # 施工中
+        # =======================================
         
         # gen = gen_vocab()
         # word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
