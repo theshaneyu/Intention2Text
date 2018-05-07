@@ -146,35 +146,18 @@ class preprocessing(object):
         - description當中有「這」的item
         - description或context中含有「貸」的item
         """
-        c1 = 0
-        c2 = 0
-
         result_list = []
+        counter_dict = {'這': 0, '貸':0, '補習':0}
         for item in tqdm(data):
-            found_1 = False
-            found_2 = False
-            for ch in item['description']: # 檢查description
-                if ch == '這':
-                    found_1 = True
-                    c1 += 1
-                elif ch == '貸':
-                    found_2 = True
-                    c2 += 1
-                if found_1 and found_2:
-                    break
-            for ch in item['context']: # 檢查context
-                if ch == '貸':
-                    if not found_2:
-                        c2 += 1
-                        found_2 = True
-                        break
-            if found_1 or found_2:
-                continue
-            else:
-                result_list.append(item)
-        print('description中含有「這」', c1)
-        print('description或context中含有「貸」', c2)
-        return result_list
+            if '這' in item['description']:
+                counter_dict['這'] += 1
+            if '貸' in item['description'] or '貸' in item['context']:
+                counter_dict['貸'] += 1
+            if '補習' in item['description']:
+                counter_dict['補習'] += 1
+        pprint(counter_dict)
+
+
 
     def _sample_data_to_see(self, data, num):
         # sample東西出來看
@@ -301,12 +284,12 @@ class preprocessing(object):
         with open('../yahoo_knowledge_data/corpus/ver_4/preprocessed_data.json', 'r') as rf:
             data = json.load(rf)
 
-        data_old = data
+        # data_old = data
         data = self.filter_specific_word(data)
 
-        print('=====原本有', len(data_old), '筆資料=====')
-        print('=====濾完之後只剩', len(data), '筆資料=====')
-        print('總共濾掉', len(data_old) - len(data), '筆資料')
+        # print('=====原本有', len(data_old), '筆資料=====')
+        # print('=====濾完之後只剩', len(data), '筆資料=====')
+        # print('總共濾掉', len(data_old) - len(data), '筆資料')
         
         # # sample東西出來看
         # data = self._sample_data_to_see(data, 100)
