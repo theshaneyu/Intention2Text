@@ -147,17 +147,16 @@ class preprocessing(object):
         - description或context中含有「貸」的item
         """
         result_list = []
-        counter_dict = {'這': 0, '貸':0, '補習':0}
-        for item in tqdm(data):
-            if '這' in item['description']:
-                counter_dict['這'] += 1
-            if '貸' in item['description'] or '貸' in item['context']:
-                counter_dict['貸'] += 1
-            if '補習' in item['description']:
-                counter_dict['補習'] += 1
-        pprint(counter_dict)
-
-
+        for item in data:
+            if not ('這' in item['description'] or
+                    '貸' in item['description'] or
+                    '貸' in item['context'] or
+                    '補習' in item['description'] or
+                    '補習' in item['context'] or
+                    '家教' in item['description'] or
+                    '家教' in item['context']):
+                result_list.append(item)
+        return result_list
 
     def _sample_data_to_see(self, data, num):
         # sample東西出來看
@@ -226,12 +225,18 @@ class preprocessing(object):
 
     def go_through_processes_for_description(self, string):
         try:
+            # 1) 只保留中文、逗點、句點、數字 2) 空格、半形逗點轉成逗點 3) 數字轉成# 4) 清除連續的逗點、句點和#
             string = self.remove_and_convert_character(string)
+            # 刪除description當中，結尾在求點數的部分
             string = self.remove_asking_for_points(string) # description才需要
+            # 移除頭和尾的逗號
             string = self.remove_comma_at_head_and_tail(string)
+            # 確定結尾有沒有句號，如果沒有就加上去
             string = self.check_for_period(string)
-            # string = self.segmentation(string)
-            # string = self.insert_tags(string)
+            # 斷詞
+            string = self.segmentation(string)
+            # 加入標籤
+            string = self.insert_tags(string)
             return string
         except:
             return
@@ -267,39 +272,28 @@ class preprocessing(object):
         #     else:
         #         err += 1
 
-        # with open('../yahoo_knowledge_data/corpus/ver_3/preprocessed_data.json', 'w') as wf:
+        # with open('../yahoo_knowledge_data/corpus/ver_4/preprocessed_data.json', 'w') as wf:
         #     json.dump(out_list, wf)
 
         # print('全部資料總共', len(data), '筆')
         # print('前處理清資料總共清掉', err, '筆')    
-        # print('無法處理資料總計', (len(data) - err), '筆')
+        # print('乾淨資料總計', (len(data) - err), '筆')
         
         """
         以上做完前處理，為了加速所以先存檔，接著下來用讀檔的比較快，之後也可以串起來一次做完。
         """
 
-        # =======================================
-        # 施工中
-
         with open('../yahoo_knowledge_data/corpus/ver_4/preprocessed_data.json', 'r') as rf:
             data = json.load(rf)
 
-        # data_old = data
         data = self.filter_specific_word(data)
-
-        # print('=====原本有', len(data_old), '筆資料=====')
-        # print('=====濾完之後只剩', len(data), '筆資料=====')
-        # print('總共濾掉', len(data_old) - len(data), '筆資料')
         
         # # sample東西出來看
         # data = self._sample_data_to_see(data, 100)
         # pprint(data)
-
-        # 施工中
-        # =======================================
         
-        # gen = gen_vocab()
-        # word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
+        gen = gen_vocab()
+        word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
 
         # print('==== 開始轉換<UNK> ====')
         # data = self.convert_UNK(word_count, data) # 轉換UNK
