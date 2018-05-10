@@ -266,8 +266,8 @@ class preprocessing(object):
         # with open('../yahoo_knowledge_data/corpus/init_data.json') as rf:
         #     data = json.load(rf)
         
-        # # # sample東西出來看
-        # # data = random.sample(data, 100)
+        # # sample東西出來看
+        # data = random.sample(data, 100)
 
         # err = 0
         # out_list = []
