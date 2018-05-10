@@ -158,6 +158,16 @@ class preprocessing(object):
                 result_list.append(item)
         return result_list
 
+    def remove_duplicate(self, data):
+        """刪除重複的context"""
+        unique_set = set()
+        result_list = []
+        for item in data:
+            if item['context'] not in unique_set:
+                unique_set.add(item['context'])
+                result_list.append(item)
+        return result_list
+
     def _sample_data_to_see(self, data, num):
         # sample東西出來看
         for item in random.sample(data, num):
@@ -285,9 +295,12 @@ class preprocessing(object):
 
         with open('../yahoo_knowledge_data/corpus/ver_4/preprocessed_data.json', 'r') as rf:
             data = json.load(rf)
-
-        data = self.filter_specific_word(data)
         
+        # 過濾掉含有特定字串的item
+        data = self.filter_specific_word(data)
+        # 刪除重複context的item
+        data = self.remove_duplicate(data)
+
         # # sample東西出來看
         # data = self._sample_data_to_see(data, 100)
         # pprint(data)
@@ -295,28 +308,29 @@ class preprocessing(object):
         gen = gen_vocab()
         word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
 
-        # print('==== 開始轉換<UNK> ====')
-        # data = self.convert_UNK(word_count, data) # 轉換UNK
+        print('==== 開始轉換<UNK> ====')
+        data = self.convert_UNK(word_count, data) # 轉換UNK
 
+        word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
+        print('最後版本的vocab是', len(word_count), '個字')
 
-        # word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
-        # print('最後版本的vocab是', len(word_count), '個字')
-
-        # # 產生vocab
-        # gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_3/vocab')
+        # 產生vocab
+        gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_5/vocab')
         
-        # train, valid, test = self.split_train_valid(data, test_size=.0001, valid_size=.2) # 回傳(train, valid, test)
-        # print('train size', len(train))
-        # print('valid size', len(valid))
-        # print('test size', len(test))
+        print('==== 開始分train, valid ====')
+        train, valid, test = self.split_train_valid(data, test_size=.0002, valid_size=.1) # 回傳(train, valid, test)
+        print('train size', len(train))
+        print('valid size', len(valid))
+        print('test size', len(test))
 
-        # # 產生data_convert_example.py可以吃的格式的資料
-        # self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_3/readable_data_ready')
-        # self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_3/readable_data_ready')
-        # self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_3/readable_data_ready')
-        # text_to_binary('../yahoo_knowledge_data/train/ver_3/readable_data_ready', '../yahoo_knowledge_data/train/ver_3/data')
-        # text_to_binary('../yahoo_knowledge_data/valid/ver_3/readable_data_ready', '../yahoo_knowledge_data/valid/ver_3/data')
-        # text_to_binary('../yahoo_knowledge_data/decode/ver_3/readable_data_ready', '../yahoo_knowledge_data/decode/ver_3/data')
+        # 產生data_convert_example.py可以吃的格式的資料
+        print('==== 開始產生input data ====')
+        self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_5/readable_data_ready')
+        self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_5/readable_data_ready')
+        self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_5/readable_data_ready')
+        text_to_binary('../yahoo_knowledge_data/train/ver_5/readable_data_ready', '../yahoo_knowledge_data/train/ver_5/data')
+        text_to_binary('../yahoo_knowledge_data/valid/ver_5/readable_data_ready', '../yahoo_knowledge_data/valid/ver_5/data')
+        text_to_binary('../yahoo_knowledge_data/decode/ver_5/readable_data_ready', '../yahoo_knowledge_data/decode/ver_5/data')
 
 
 if __name__ == '__main__':
