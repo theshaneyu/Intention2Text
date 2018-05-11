@@ -1,4 +1,5 @@
 from preprocessing import preprocessing
+from gen_vocab import gen_vocab
 from pprint import pprint
 import json
 from tqdm import tqdm
@@ -36,7 +37,7 @@ def description_processes(string):
 def split_characters(string):
     return ' '.join(list(string))
 
-def filter_specific_word(self, data):
+def filter_specific_word(data):
     """專門過濾掉一些含有特定關鍵字的item
     - description當中有「這」的item
     - description或context中含有「貸」的item
@@ -46,12 +47,14 @@ def filter_specific_word(self, data):
         if not ('這' in item['description'] or
                 '貸' in item['description'] or
                 '貸' in item['context'] or
-                '補習' in item['description'] or
-                '補習' in item['context'] or
-                '家教' in item['description'] or
-                '家教' in item['context']):
+                '補 習' in item['description'] or
+                '補 習' in item['context'] or
+                '家 教' in item['description'] or
+                '家 教' in item['context']):
             result_list.append(item)
     return result_list
+
+
 
 
 
@@ -86,17 +89,42 @@ def main():
     with open('../yahoo_knowledge_data/corpus/ver_6/preprocessed_data.json', 'r') as rf:
         data = json.load(rf)
     
+    
     # 過濾掉含有特定字串的item
-    data = preprocessing.filter_specific_word(data)
+    data = filter_specific_word(data)
     # 刪除重複context的item
     data = preprocessing.remove_duplicate(data)
 
-    # sample東西出來看
-    data = preprocessing._sample_data_to_see(data, 100)
-    pprint(data)
+    # # sample東西出來看
+    # data = preprocessing._sample_data_to_see(data, 100)
+    # pprint(data)
 
+    gen = gen_vocab()
+    word_count = gen.get_word_count_with_threshold(data, 300) # 用來轉換UNK的counter
 
+    # print('==== 開始轉換<UNK> ====')
+    # data = self.convert_UNK(word_count, data) # 轉換UNK
 
+    # word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
+    # print('最後版本的vocab是', len(word_count), '個字')
+
+    # # 產生vocab
+    # gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_5/vocab')
+    
+    # print('==== 開始分train, valid ====')
+    # train, valid, test = self.split_train_valid(data, test_size=.0002, valid_size=.1) # 回傳(train, valid, test)
+    # print('train size', len(train))
+    # print('valid size', len(valid))
+    # print('test size', len(test))
+
+    # # 產生data_convert_example.py可以吃的格式的資料
+    # print('==== 開始產生input data ====')
+    # self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_5/readable_data_ready')
+    # self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_5/readable_data_ready')
+    # self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_5/readable_data_ready')
+    # text_to_binary('../yahoo_knowledge_data/train/ver_5/readable_data_ready', '../yahoo_knowledge_data/train/ver_5/data')
+    # text_to_binary('../yahoo_knowledge_data/valid/ver_5/readable_data_ready', '../yahoo_knowledge_data/valid/ver_5/data')
+    # text_to_binary('../yahoo_knowledge_data/decode/ver_5/readable_data_ready', '../yahoo_knowledge_data/decode/ver_5/data')
 
 
 
