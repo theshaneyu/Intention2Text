@@ -19,7 +19,7 @@ import seq2seq_attention_decode
 import seq2seq_attention_model
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '1' # 指定使用某顆GPU跑
+os.environ["CUDA_VISIBLE_DEVICES"] = '0' # 指定使用某顆GPU跑
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -117,7 +117,7 @@ def _Eval(model, data_batcher, vocab=None):
     summary_writer = tf.summary.FileWriter(FLAGS.eval_dir)
     
     config = tf.ConfigProto(allow_soft_placement=True)
-    config.gpu_options.per_process_gpu_memory_fraction = .3 # 指定GPU記憶體只吃一半
+    config.gpu_options.per_process_gpu_memory_fraction = .2 # 指定GPU記憶體只吃一半
     
     sess = tf.Session(config=config)
     running_avg_loss = 0
@@ -174,13 +174,13 @@ def main(unused_argv):
                         lr=0.15,  # learning rate
                         batch_size=batch_size,
                         enc_layers=2,
-                        enc_timesteps=120,
+                        enc_timesteps=160,
                         dec_timesteps=30,
                         min_input_len=2,  # discard articles/summaries < than this
                         num_hidden=128,  # for rnn cell
                         emb_dim=128,  # If 0, don't use embedding
                         max_grad_norm=2,
-                        num_softmax_samples=4096)  # If 0, no sampled softmax.
+                        num_softmax_samples=200)  # If 0, no sampled softmax.
 
     batcher = batch_reader.Batcher(
         FLAGS.data_path, vocab, hps, FLAGS.article_key,

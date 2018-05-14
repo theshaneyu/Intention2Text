@@ -1,5 +1,6 @@
 from preprocessing import preprocessing
 from gen_vocab import gen_vocab
+from data_convert_example import text_to_binary
 from pprint import pprint
 import json
 from tqdm import tqdm
@@ -100,31 +101,31 @@ def main():
     # pprint(data)
 
     gen = gen_vocab()
-    word_count = gen.get_word_count_with_threshold(data, 300) # 用來轉換UNK的counter
+    word_count = gen.get_word_count_with_threshold(data, 100) # 用來轉換UNK的counter
 
-    # print('==== 開始轉換<UNK> ====')
-    # data = self.convert_UNK(word_count, data) # 轉換UNK
+    print('==== 開始轉換<UNK> ====')
+    data = preprocessing.convert_UNK(word_count, data) # 轉換UNK
 
-    # word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
-    # print('最後版本的vocab是', len(word_count), '個字')
+    word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
+    print('最後版本的vocab是', len(word_count), '個字')
 
-    # # 產生vocab
-    # gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_5/vocab')
+    # 產生vocab
+    gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_6/vocab')
     
-    # print('==== 開始分train, valid ====')
-    # train, valid, test = self.split_train_valid(data, test_size=.0002, valid_size=.1) # 回傳(train, valid, test)
-    # print('train size', len(train))
-    # print('valid size', len(valid))
-    # print('test size', len(test))
+    print('==== 開始分train, valid ====')
+    train, valid, test = preprocessing.split_train_valid(data, test_size=.0005, valid_size=.1) # 回傳(train, valid, test)
+    print('train size', len(train))
+    print('valid size', len(valid))
+    print('test size', len(test))
 
-    # # 產生data_convert_example.py可以吃的格式的資料
-    # print('==== 開始產生input data ====')
-    # self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_5/readable_data_ready')
-    # self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_5/readable_data_ready')
-    # self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_5/readable_data_ready')
-    # text_to_binary('../yahoo_knowledge_data/train/ver_5/readable_data_ready', '../yahoo_knowledge_data/train/ver_5/data')
-    # text_to_binary('../yahoo_knowledge_data/valid/ver_5/readable_data_ready', '../yahoo_knowledge_data/valid/ver_5/data')
-    # text_to_binary('../yahoo_knowledge_data/decode/ver_5/readable_data_ready', '../yahoo_knowledge_data/decode/ver_5/data')
+    # 產生data_convert_example.py可以吃的格式的資料
+    print('==== 開始產生input data ====')
+    preprocessing.gen_input_format(train, '../yahoo_knowledge_data/train/ver_6/readable_data_ready')
+    preprocessing.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_6/readable_data_ready')
+    preprocessing.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_6/readable_data_ready')
+    text_to_binary('../yahoo_knowledge_data/train/ver_6/readable_data_ready', '../yahoo_knowledge_data/train/ver_6/data')
+    text_to_binary('../yahoo_knowledge_data/valid/ver_6/readable_data_ready', '../yahoo_knowledge_data/valid/ver_6/data')
+    text_to_binary('../yahoo_knowledge_data/decode/ver_6/readable_data_ready', '../yahoo_knowledge_data/decode/ver_6/data')
 
 
 
