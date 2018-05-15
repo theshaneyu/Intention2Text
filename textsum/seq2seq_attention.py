@@ -19,6 +19,8 @@ import seq2seq_attention_decode
 import seq2seq_attention_model
 import os
 
+from tensorflow.contrib.tensorboard.plugins import projector
+
 os.environ["CUDA_VISIBLE_DEVICES"] = '1' # 指定使用某顆GPU跑
 
 
@@ -92,6 +94,18 @@ def _Train(model, data_batcher):
         sess = sv.prepare_or_wait_for_session(config=config)
         running_avg_loss = 0
         step = 0
+
+        #####################################################################
+        # tensorboard上的projector可視化
+        config = projector.ProjectorConfig()
+        embeddingConfig = config.embeddings.add()
+        embeddingConfig.tensor_name = model.embedding.name
+        # embeddingConfig.metadata_path = '../novel_sentence2/word2id.tsv'
+        embeddingConfig.metadata_path = '/home/nj/styleTransfer/novel_sentence2/id2word.tsv'
+        # summary_writer = tf.summary.FileWriter(FLAGS.model_dir)
+        projector.visualize_embeddings(summary_writer, config)
+        #####################################################################
+
         while not sv.should_stop() and step < FLAGS.max_run_steps:
             (article_batch, abstract_batch, targets, article_lens, abstract_lens,
              loss_weights, _, _) = data_batcher.NextBatch()
