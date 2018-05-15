@@ -21,7 +21,7 @@ import os
 
 from tensorflow.contrib.tensorboard.plugins import projector
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '1' # 指定使用某顆GPU跑
+os.environ["CUDA_VISIBLE_DEVICES"] = '0' # 指定使用某顆GPU跑
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -74,6 +74,9 @@ def _RunningAvgLoss(loss, running_avg_loss, summary_writer, step, decay=0.999):
 
 def _Train(model, data_batcher):
     """Runs model training."""
+    print('==========')
+    print(FLAGS.vocab_path)
+    print('==========')
     with tf.device('/cpu:0'):
         model.build_graph()
         saver = tf.train.Saver()
@@ -97,13 +100,11 @@ def _Train(model, data_batcher):
 
         #####################################################################
         # tensorboard上的projector可視化
-        config = projector.ProjectorConfig()
-        embeddingConfig = config.embeddings.add()
-        embeddingConfig.tensor_name = model.embedding.name
-        # embeddingConfig.metadata_path = '../novel_sentence2/word2id.tsv'
-        embeddingConfig.metadata_path = '/home/nj/styleTransfer/novel_sentence2/id2word.tsv'
-        # summary_writer = tf.summary.FileWriter(FLAGS.model_dir)
-        projector.visualize_embeddings(summary_writer, config)
+        embedding_config = projector.ProjectorConfig()
+        embeddingConfig = embedding_config.embeddings.add()
+        embeddingConfig.tensor_name = model.embedding_tensors_for_projector.name
+        embeddingConfig.metadata_path = '~/Projects/behavior2text/yahoo_knowledge_data/vocab/ver_4/vocab.tsv'
+        projector.visualize_embeddings(summary_writer, embedding_config)
         #####################################################################
 
         while not sv.should_stop() and step < FLAGS.max_run_steps:
@@ -185,7 +186,7 @@ def main(unused_argv):
     hps = seq2seq_attention_model.HParams(
                         mode=FLAGS.mode,  # train, eval, decode
                         min_lr=0.0001,  # min learning rate.
-                        lr=0.15,  # learning rate
+                        lr=.03493,  # learning rate
                         batch_size=batch_size,
                         enc_layers=2,
                         enc_timesteps=120,

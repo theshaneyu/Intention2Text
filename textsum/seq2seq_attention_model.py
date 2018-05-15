@@ -134,6 +134,12 @@ class Seq2SeqAttentionModel(object):
                 embedding = tf.get_variable(
                         'embedding', [vsize, hps.emb_dim], dtype=tf.float32,
                         initializer=tf.truncated_normal_initializer(stddev=1e-4))
+
+                ################################################################################
+                # 為了projector可以查單字
+                self.embedding_tensors_for_projector = embedding
+                ################################################################################
+
                 emb_encoder_inputs = [tf.nn.embedding_lookup(embedding, x)
                                             for x in encoder_inputs]
                 emb_decoder_inputs = [tf.nn.embedding_lookup(embedding, x)
