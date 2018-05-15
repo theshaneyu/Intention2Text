@@ -76,9 +76,6 @@ def _RunningAvgLoss(loss, running_avg_loss, summary_writer, step, decay=0.999):
 
 def _Train(model, data_batcher):
     """Runs model training."""
-    print('==========')
-    print(FLAGS.vocab_path)
-    print('==========')
     with tf.device('/cpu:0'):
         model.build_graph()
         saver = tf.train.Saver()
@@ -105,7 +102,7 @@ def _Train(model, data_batcher):
         embedding_config = projector.ProjectorConfig()
         embeddingConfig = embedding_config.embeddings.add()
         embeddingConfig.tensor_name = model.embedding_tensors_for_projector.name
-        embeddingConfig.metadata_path = '~/Projects/behavior2text/yahoo_knowledge_data/vocab/ver_4/vocab.tsv'
+        embeddingConfig.metadata_path = '~/Projects/behavior2text/' + FLAGS.vocab_path + '.tsv'
         projector.visualize_embeddings(summary_writer, embedding_config)
         #####################################################################
 

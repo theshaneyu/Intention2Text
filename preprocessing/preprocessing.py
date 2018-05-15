@@ -314,8 +314,9 @@ class preprocessing(object):
         word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
         print('最後版本的vocab是', len(word_count), '個字')
 
-        # 產生vocab
-        gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_5/vocab')
+        # 產生vocab，順便產生vocab.tsv
+        gen.gen_final_vocab_and_vocab_tsv(word_count, '../yahoo_knowledge_data/vocab/ver_5/vocab')
+        
         
         print('==== 開始分train, valid ====')
         train, valid, test = self.split_train_valid(data, test_size=.0002, valid_size=.1) # 回傳(train, valid, test)

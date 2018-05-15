@@ -110,7 +110,7 @@ def main():
     print('最後版本的vocab是', len(word_count), '個字')
 
     # 產生vocab
-    gen.gen_final_vocab(word_count, '../yahoo_knowledge_data/vocab/ver_6/vocab')
+    gen.gen_final_vocab_and_vocab_tsv(word_count, '../yahoo_knowledge_data/vocab/ver_6/vocab')
     
     print('==== 開始分train, valid ====')
     train, valid, test = preprocessing.split_train_valid(data, test_size=.0005, valid_size=.1) # 回傳(train, valid, test)

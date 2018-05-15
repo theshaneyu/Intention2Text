@@ -9,12 +9,18 @@ class gen_vocab(object):
     def __init__(self):
         pass
 
-    def gen_final_vocab(self, cnt, out_path):
-        """產生正式的vocab"""
+    def gen_final_vocab_and_vocab_tsv(self, cnt, out_path):
+        """產生正式的vocab，順便產生vocab.tsv"""
         with open(out_path, 'w') as wf:
             for pair in cnt:
                 wf.write(pair[0] + ' ' + str(pair[1]) + '\n')
             wf.write('<PAD> 0')
+        
+        with open(out_path + '.tsv', 'w') as wf:
+            wf.write('word' + '\t' + 'id' + '\n')
+            for pair in cnt:
+                wf.write(pair[0] + '\t' + str(pair[1]) + '\n')
+            wf.write('<PAD>' + '\t' + '0')
 
     def _filter_words_with_threshold(self, ordered_itemized_cnt, threshold):
         """
