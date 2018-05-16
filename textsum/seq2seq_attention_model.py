@@ -1,10 +1,11 @@
-"""Sequence-to-Sequence with attention model for text summarization."""
+"""Sequence-to-Sequence with attention model for behavior2text"""
 from collections import namedtuple
 
 import numpy as np
 import seq2seq_lib
 from six.moves import xrange
 import tensorflow as tf
+
 
 HParams = namedtuple('HParams',
                      'mode, min_lr, lr, batch_size, '

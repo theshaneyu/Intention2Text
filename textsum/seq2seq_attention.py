@@ -185,16 +185,16 @@ def main(unused_argv):
     hps = seq2seq_attention_model.HParams(
                         mode=FLAGS.mode,  # train, eval, decode
                         min_lr=0.0001,  # min learning rate.
-                        lr=.03493,  # learning rate
+                        lr=0.15,  # learning rate
                         batch_size=batch_size,
                         enc_layers=2,
-                        enc_timesteps=160,
+                        enc_timesteps=120,
                         dec_timesteps=30,
                         min_input_len=2,  # discard articles/summaries < than this
                         num_hidden=128,  # for rnn cell
                         emb_dim=128,  # If 0, don't use embedding
                         max_grad_norm=2,
-                        num_softmax_samples=200)  # If 0, no sampled softmax.
+                        num_softmax_samples=4096)  # If 0, no sampled softmax.
 
     batcher = batch_reader.Batcher(
         FLAGS.data_path, vocab, hps, FLAGS.article_key,

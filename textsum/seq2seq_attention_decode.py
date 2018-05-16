@@ -7,16 +7,18 @@ import beam_search
 import data
 from six.moves import xrange
 import tensorflow as tf
+from data_convert_example import text_to_binary
+
 
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_integer('max_decode_steps', 1000000,
-                                                        'Number of decoding steps.')
-tf.app.flags.DEFINE_integer('decode_batches_per_ckpt', 8000,
-                                                        'Number of batches to decode before restoring next '
-                                                        'checkpoint')
+                            'Number of decoding steps.')
+tf.app.flags.DEFINE_integer('decode_batches_per_ckpt', 1,
+                            'Number of batches to decode before restoring next '
+                            'checkpoint')
 
-DECODE_LOOP_DELAY_SECS = 60
-DECODE_IO_FLUSH_INTERVAL = 100
+# DECODE_LOOP_DELAY_SECS = 10
+# DECODE_IO_FLUSH_INTERVAL = 10000
 
 
 class DecodeIO(object):
@@ -30,34 +32,53 @@ class DecodeIO(object):
         self._outdir = outdir
         if not os.path.exists(self._outdir):
             os.mkdir(self._outdir)
-        self._ref_file = None
-        self._decode_file = None
+        # self._ref_file = None
+        # self._decode_file = None
+        self.result_file = open(os.path.join(self._outdir, 'result'), 'w')
 
-    def Write(self, reference, decode):
+    def Write(self, article, reference, decode):
         """Writes the reference and decoded outputs to RKV files.
 
         Args:
             reference: The human (correct) result.
             decode: The machine-generated result
         """
-        print('正確結果：', reference)
-        print('模型輸出結果', decode)
-        self._ref_file.write('output=%s\n' % reference)
-        self._decode_file.write('output=%s\n' % decode)
-        self._cnt += 1
-        if self._cnt % DECODE_IO_FLUSH_INTERVAL == 0:
-            self._ref_file.flush()
-            self._decode_file.flush()
+        # self._ref_file.write('output=%s\n' % reference)
+        # self._decode_file.write('output=%s\n' % decode)
+
+
+        # self.result_file.write('[輸入的Behavior Context]\n%s\n' % article)
+        # self.result_file.write('[真實人類的description]\n%s\n' % reference)
+        # self.result_file.write('[機器產生的description]\n%s\n' % decode)
+        # self.result_file.write('-----------------------------------------------------\n')
+
+        print('[輸入的Behavior Context]\n%s\n' % article)
+        print('[真實人類的description]\n%s\n' % reference)
+        print('[機器產生的description]\n%s\n' % decode)
+        print('-----------------------------------------------------\n')        
+        
+        kb_input = input('輸入：')
+        text_to_binary('yahoo_knowledge_data/decode/ver_5/dataset_ready/data_ready_' + kb_input,
+                        'yahoo_knowledge_data/decode/decode_data')
+
+        # self._cnt += 1
+        # if self._cnt % DECODE_IO_FLUSH_INTERVAL == 0:
+        #     # self._ref_file.flush()
+        #     # self._decode_file.flush()
+        #     self.result_file.flush()
+
 
     def ResetFiles(self):
         """Resets the output files. Must be called once before Write()."""
-        if self._ref_file: self._ref_file.close()
-        if self._decode_file: self._decode_file.close()
-        timestamp = int(time.time())
-        self._ref_file = open(
-                os.path.join(self._outdir, 'ref%d'%timestamp), 'w')
-        self._decode_file = open(
-                os.path.join(self._outdir, 'decode%d'%timestamp), 'w')
+        # if self._ref_file: self._ref_file.close()
+        # if self._decode_file: self._decode_file.close()
+        if self.result_file: self.result_file.close()
+        # timestamp = int(time.time())
+        # self._ref_file = open(
+        #         os.path.join(self._outdir, 'ref%d'%timestamp), 'w')
+        # self._decode_file = open(
+        #         os.path.join(self._outdir, 'decode%d'%timestamp), 'w')
+        self.result_file = open(os.path.join(self._outdir, 'result'), 'w')
 
 
 class BSDecoder(object):
@@ -85,7 +106,7 @@ class BSDecoder(object):
         sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
         step = 0
         while step < FLAGS.max_decode_steps:
-            time.sleep(DECODE_LOOP_DELAY_SECS)
+            # time.sleep(DECODE_LOOP_DELAY_SECS)
             if not self._Decode(self._saver, sess):
                 continue
             step += 1
@@ -110,7 +131,7 @@ class BSDecoder(object):
         tf.logging.info('renamed checkpoint path %s', ckpt_path)
         saver.restore(sess, ckpt_path)
 
-        self._decode_io.ResetFiles()
+        # self._decode_io.ResetFiles()
         for _ in xrange(FLAGS.decode_batches_per_ckpt):
             (article_batch, _, _, article_lens, _, _, origin_articles,
              origin_abstracts) = self._batch_reader.NextBatch()
@@ -146,4 +167,4 @@ class BSDecoder(object):
         tf.logging.info('article:  %s', article)
         tf.logging.info('abstract: %s', abstract)
         tf.logging.info('decoded:  %s', decoded_output)
-        self._decode_io.Write(abstract, decoded_output.strip())
+        self._decode_io.Write(article, abstract, decoded_output.strip())

@@ -240,14 +240,14 @@ class preprocessing(object):
 
 def split_decode_data():
     file_num = 1
-    with open('../yahoo_knowledge_data/decode/ver_2/readable_data_ready') as rf:
+    with open('../yahoo_knowledge_data/decode/ver_5/readable_data_ready') as rf:
         for line in rf:
-            with open('../yahoo_knowledge_data/decode/ver_2/dataset_ready/data_ready_' + str(file_num), 'w') as wf:
+            with open('../yahoo_knowledge_data/decode/ver_5/dataset_ready/data_ready_' + str(file_num), 'w') as wf:
                 wf.write(line.replace('\n', ''))
             file_num += 1
     file_num = 1
-    for item in glob('../yahoo_knowledge_data/decode/ver_2/dataset_ready/*'):
-        text_to_binary(item, '../yahoo_knowledge_data/decode/ver_2/dataset_input/data_' + str(file_num))
+    for item in glob('../yahoo_knowledge_data/decode/ver_5/dataset_ready/*'):
+        text_to_binary(item, '../yahoo_knowledge_data/decode/ver_5/dataset_input/data_' + str(file_num))
         file_num += 1
 
 

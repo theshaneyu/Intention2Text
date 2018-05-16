@@ -37,33 +37,23 @@ def _binary_to_text():
     reader.close()
     writer.close()
 
-
-def _text_to_binary():
-    inputs = open(FLAGS.in_file, 'r').readlines()
-    writer = open(FLAGS.out_file, 'wb')
-    c = 0
+def text_to_binary(in_file_path, out_file_path):
+    inputs = open(in_file_path, 'r').readlines()
+    writer = open(out_file_path, 'wb')
     for inp in inputs:
         tf_example = example_pb2.Example()
         for feature in inp.strip().split('\t'):
-            (k, v) = feature.split('=', 1)
+            (k, v) = feature.split('=')
             tf_example.features.feature[k.encode('utf8')].bytes_list.value.extend([v.encode('utf8')])
         tf_example_str = tf_example.SerializeToString()
         str_len = len(tf_example_str)
         writer.write(struct.pack('q', str_len))
         writer.write(struct.pack('%ds' % str_len, tf_example_str))
-        c += 1
-        if c % 5000 == 0:
-            print(c)
     writer.close()
 
-
-def main(unused_argv):
-    assert FLAGS.command and FLAGS.in_file and FLAGS.out_file
-    if FLAGS.command == 'binary_to_text':
-        _binary_to_text()
-    elif FLAGS.command == 'text_to_binary':
-        _text_to_binary()
+def main():
+    text_to_binary('../yahoo_knowledge_data/data_ready', '../yahoo_knowledge_data/data')
 
 
 if __name__ == '__main__':
-    tf.app.run()
+    main()
