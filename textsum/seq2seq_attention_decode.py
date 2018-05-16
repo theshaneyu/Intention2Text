@@ -7,7 +7,9 @@ import beam_search
 import data
 from six.moves import xrange
 import tensorflow as tf
-from data_convert_example import text_to_binary
+
+
+import batch_reader
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -28,13 +30,14 @@ class DecodeIO(object):
     """
 
     def __init__(self, outdir):
-        self._cnt = 0
-        self._outdir = outdir
-        if not os.path.exists(self._outdir):
-            os.mkdir(self._outdir)
+        pass
+        # self._cnt = 0
+        # self._outdir = outdir
+        # if not os.path.exists(self._outdir):
+        #     os.mkdir(self._outdir)
         # self._ref_file = None
         # self._decode_file = None
-        self.result_file = open(os.path.join(self._outdir, 'result'), 'w')
+        # self.result_file = open(os.path.join(self._outdir, 'result'), 'w')
 
     def Write(self, article, reference, decode):
         """Writes the reference and decoded outputs to RKV files.
@@ -52,14 +55,13 @@ class DecodeIO(object):
         # self.result_file.write('[機器產生的description]\n%s\n' % decode)
         # self.result_file.write('-----------------------------------------------------\n')
 
+        print('--------------------------------------------------')
         print('[輸入的Behavior Context]\n%s\n' % article)
         print('[真實人類的description]\n%s\n' % reference)
         print('[機器產生的description]\n%s\n' % decode)
-        print('-----------------------------------------------------\n')        
+        print('--------------------------------------------------')
         
-        kb_input = input('輸入：')
-        text_to_binary('yahoo_knowledge_data/decode/ver_5/dataset_ready/data_ready_' + kb_input,
-                        'yahoo_knowledge_data/decode/decode_data')
+        
 
         # self._cnt += 1
         # if self._cnt % DECODE_IO_FLUSH_INTERVAL == 0:
@@ -84,7 +86,7 @@ class DecodeIO(object):
 class BSDecoder(object):
     """Beam search decoder."""
 
-    def __init__(self, model, batch_reader, hps, vocab):
+    def __init__(self, model, hps, vocab, to_build_grapth):
         """Beam search decoding.
 
         Args:
@@ -94,8 +96,14 @@ class BSDecoder(object):
             vocab: Vocabulary
         """
         self._model = model
-        self._model.build_graph()
-        self._batch_reader = batch_reader
+        if to_build_grapth:
+            self._model.build_graph()
+        # 這是batch_reader.Batcher物件，只使用.NextBatch()函式
+        self._batch_reader = batch_reader.Batcher(
+                FLAGS.data_path, vocab, hps, FLAGS.article_key,
+                FLAGS.abstract_key, FLAGS.max_article_sentences,
+                FLAGS.max_abstract_sentences, bucketing=FLAGS.use_bucketing,
+                truncate_input=FLAGS.truncate_input)
         self._hps = hps
         self._vocab = vocab
         self._saver = tf.train.Saver()
@@ -104,12 +112,13 @@ class BSDecoder(object):
     def DecodeLoop(self):
         """Decoding loop for long running process."""
         sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
-        step = 0
-        while step < FLAGS.max_decode_steps:
-            # time.sleep(DECODE_LOOP_DELAY_SECS)
-            if not self._Decode(self._saver, sess):
-                continue
-            step += 1
+        self._Decode(self._saver, sess)
+        # step = 0
+        # while step < FLAGS.max_decode_steps:
+        #     # time.sleep(DECODE_LOOP_DELAY_SECS)
+        #     if not self._Decode(self._saver, sess):
+        #         continue
+        #     step += 1
 
     def _Decode(self, saver, sess):
         """Restore a checkpoint and decode it.
@@ -150,6 +159,7 @@ class BSDecoder(object):
                 decode_output = [int(t) for t in best_beam.tokens[1:]]
                 self._DecodeBatch(
                         origin_articles[i], origin_abstracts[i], decode_output)
+                break
         return True
 
     def _DecodeBatch(self, article, abstract, output_ids):
