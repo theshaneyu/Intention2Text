@@ -144,8 +144,8 @@ def main(_):
     # {tf.global_variables_initializer().run()}
     conv1_weights = tf.Variable(
             tf.truncated_normal([5, 5, NUM_CHANNELS, 32],  # 5x5 filter, depth 32.
-                                                    stddev=0.1,
-                                                    seed=SEED, dtype=data_type()))
+                                stddev=0.1,
+                                seed=SEED, dtype=data_type()))
     conv1_biases = tf.Variable(tf.zeros([32], dtype=data_type()))
     conv2_weights = tf.Variable(tf.truncated_normal(
             [5, 5, 32, 64], stddev=0.1,
@@ -153,14 +153,14 @@ def main(_):
     conv2_biases = tf.Variable(tf.constant(0.1, shape=[64], dtype=data_type()))
     fc1_weights = tf.Variable(  # fully connected, depth 512.
             tf.truncated_normal([IMAGE_SIZE // 4 * IMAGE_SIZE // 4 * 64, 512],
-                                                    stddev=0.1,
-                                                    seed=SEED,
-                                                    dtype=data_type()))
+                                stddev=0.1,
+                                seed=SEED,
+                                dtype=data_type()))
     fc1_biases = tf.Variable(tf.constant(0.1, shape=[512], dtype=data_type()))
     fc2_weights = tf.Variable(tf.truncated_normal([512, NUM_LABELS],
-                                                                                                stddev=0.1,
-                                                                                                seed=SEED,
-                                                                                                dtype=data_type()))
+                                                stddev=0.1,
+                                                seed=SEED,
+                                                dtype=data_type()))
     fc2_biases = tf.Variable(tf.constant(
             0.1, shape=[NUM_LABELS], dtype=data_type()))
 
@@ -172,26 +172,26 @@ def main(_):
         # the same size as the input). Note that {strides} is a 4D array whose
         # shape matches the data layout: [image index, y, x, depth].
         conv = tf.nn.conv2d(data,
-                                                conv1_weights,
-                                                strides=[1, 1, 1, 1],
-                                                padding='SAME')
+                            conv1_weights,
+                            strides=[1, 1, 1, 1],
+                            padding='SAME')
         # Bias and rectified linear non-linearity.
         relu = tf.nn.relu(tf.nn.bias_add(conv, conv1_biases))
         # Max pooling. The kernel size spec {ksize} also follows the layout of
         # the data. Here we have a pooling window of 2, and a stride of 2.
         pool = tf.nn.max_pool(relu,
-                                                    ksize=[1, 2, 2, 1],
-                                                    strides=[1, 2, 2, 1],
-                                                    padding='SAME')
+                            ksize=[1, 2, 2, 1],
+                            strides=[1, 2, 2, 1],
+                            padding='SAME')
         conv = tf.nn.conv2d(pool,
-                                                conv2_weights,
-                                                strides=[1, 1, 1, 1],
-                                                padding='SAME')
+                            conv2_weights,
+                            strides=[1, 1, 1, 1],
+                            padding='SAME')
         relu = tf.nn.relu(tf.nn.bias_add(conv, conv2_biases))
         pool = tf.nn.max_pool(relu,
-                                                    ksize=[1, 2, 2, 1],
-                                                    strides=[1, 2, 2, 1],
-                                                    padding='SAME')
+                            ksize=[1, 2, 2, 1],
+                            strides=[1, 2, 2, 1],
+                            padding='SAME')
         # Reshape the feature map cuboid into a 2D matrix to feed it to the
         # fully connected layers.
         pool_shape = pool.get_shape().as_list()
@@ -229,9 +229,7 @@ def main(_):
             0.95,                # Decay rate.
             staircase=True)
     # Use simple momentum for the optimization.
-    optimizer = tf.train.MomentumOptimizer(learning_rate,
-                                                                                 0.9).minimize(loss,
-                                                                                                             global_step=batch)
+    optimizer = tf.train.MomentumOptimizer(learning_rate, 0.9).minimize(loss, global_step=batch)
 
     # Predictions for the current training minibatch.
     train_prediction = tf.nn.softmax(logits)
@@ -287,15 +285,16 @@ def main(_):
                                                                             feed_dict=feed_dict)
                 elapsed_time = time.time() - start_time
                 start_time = time.time()
-                print('Step %d (epoch %.2f), %.1f ms' %
-                            (step, float(step) * BATCH_SIZE / train_size,
-                             1000 * elapsed_time / EVAL_FREQUENCY))
-                print('Minibatch loss: %.3f, learning rate: %.6f' % (l, lr))
-                print('Minibatch error: %.1f%%' % error_rate(predictions, batch_labels))
-                print('Validation error: %.1f%%' % error_rate(
-                        eval_in_batches(validation_data, sess), validation_labels))
+                # print('Step %d (epoch %.2f), %.1f ms' %
+                #             (step, float(step) * BATCH_SIZE / train_size,
+                #             1000 * elapsed_time / EVAL_FREQUENCY))
+                # print('Minibatch loss: %.3f, learning rate: %.6f' % (l, lr))
+                # print('Minibatch error: %.1f%%' % error_rate(predictions, batch_labels))
+                # print('Validation error: %.1f%%' % error_rate(eval_in_batches(validation_data, sess), validation_labels))
+                # tf.logging.set_verbosity(tf.logging.info(' 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試'))
+                tf.logging.set_verbosity('測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試')
                 sys.stdout.flush()
-        # Finally print the result!
+
         test_error = error_rate(eval_in_batches(test_data, sess), test_labels)
         print('Test error: %.1f%%' % test_error)
         if FLAGS.self_test:

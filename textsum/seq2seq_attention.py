@@ -24,7 +24,7 @@ from tensorflow.contrib.tensorboard.plugins import projector
 from data_convert_example import text_to_binary
 
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '0' # 指定使用某顆GPU跑
+os.environ["CUDA_VISIBLE_DEVICES"] = '1' # 指定使用某顆GPU跑
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -92,14 +92,14 @@ def _Train(model, data_batcher):
                                  global_step=model.global_step)
         
         config = tf.ConfigProto(allow_soft_placement=True)
-        config.gpu_options.per_process_gpu_memory_fraction = .3 # 指定GPU記憶體只吃一半
+        config.gpu_options.per_process_gpu_memory_fraction = .3
         
         sess = sv.prepare_or_wait_for_session(config=config)
         running_avg_loss = 0
         step = 0
-
+        
         #####################################################################
-        # tensorboard上的projector可視化
+        # tensorboard上的projector可視化(不用特別修改路徑，會自動根據vocab_path調整)
         embedding_config = projector.ProjectorConfig()
         embeddingConfig = embedding_config.embeddings.add()
         embeddingConfig.tensor_name = model.embedding_tensors_for_projector.name
@@ -132,7 +132,7 @@ def _Eval(model, data_batcher, vocab=None):
     summary_writer = tf.summary.FileWriter(FLAGS.eval_dir)
     
     config = tf.ConfigProto(allow_soft_placement=True)
-    config.gpu_options.per_process_gpu_memory_fraction = .2 # 指定GPU記憶體只吃一半
+    config.gpu_options.per_process_gpu_memory_fraction = .2
     
     sess = tf.Session(config=config)
     running_avg_loss = 0
@@ -185,8 +185,8 @@ def main(unused_argv):
 
     hps = seq2seq_attention_model.HParams(
                         mode=FLAGS.mode,  # train, eval, decode
-                        min_lr=0.0001,  # min learning rate.
-                        lr=0.15,  # learning rate
+                        min_lr=0.01,  # min learning rate.
+                        lr=.05,  # learning rate
                         batch_size=batch_size,
                         enc_layers=2,
                         enc_timesteps=120,
