@@ -38,8 +38,8 @@ class DecodeIO(object):
         """
         print('--------------------------------------------------')
         print('[輸入的Behavior Context]\n%s\n' % article)
-        print('[真實人類的description]\n%s\n' % reference)
-        print('[機器產生的description]\n%s\n' % decode)
+        print('[真實人類的Description]\n%s\n' % reference)
+        print('[機器產生的Description]\n%s\n' % decode)
         print('--------------------------------------------------')
 
 

@@ -285,14 +285,12 @@ def main(_):
                                                                             feed_dict=feed_dict)
                 elapsed_time = time.time() - start_time
                 start_time = time.time()
-                # print('Step %d (epoch %.2f), %.1f ms' %
-                #             (step, float(step) * BATCH_SIZE / train_size,
-                #             1000 * elapsed_time / EVAL_FREQUENCY))
-                # print('Minibatch loss: %.3f, learning rate: %.6f' % (l, lr))
-                # print('Minibatch error: %.1f%%' % error_rate(predictions, batch_labels))
-                # print('Validation error: %.1f%%' % error_rate(eval_in_batches(validation_data, sess), validation_labels))
-                # tf.logging.set_verbosity(tf.logging.info(' 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試'))
-                tf.logging.set_verbosity('測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試 測試')
+                print('Step %d (epoch %.2f), %.1f ms' %
+                            (step, float(step) * BATCH_SIZE / train_size,
+                            1000 * elapsed_time / EVAL_FREQUENCY))
+                print('Minibatch loss: %.3f, learning rate: %.6f' % (l, lr))
+                print('Minibatch error: %.1f%%' % error_rate(predictions, batch_labels))
+                print('Validation error: %.1f%%' % error_rate(eval_in_batches(validation_data, sess), validation_labels))
                 sys.stdout.flush()
 
         test_error = error_rate(eval_in_batches(test_data, sess), test_labels)
