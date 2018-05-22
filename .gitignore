@@ -28,6 +28,7 @@ seq2seq/log/
 eval_log*
 train_log*
 textsum/log/
+textsum/seq2seq_attention.py
 
 
 
