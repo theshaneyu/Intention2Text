@@ -24,7 +24,7 @@ from tensorflow.contrib.tensorboard.plugins import projector
 from data_convert_example import text_to_binary
 
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '1' # 指定使用某顆GPU跑
+os.environ["CUDA_VISIBLE_DEVICES"] = '0' # 指定使用某顆GPU跑
 
 
 FLAGS = tf.app.flags.FLAGS
