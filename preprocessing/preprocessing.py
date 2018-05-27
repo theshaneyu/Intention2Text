@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from data_convert_example import text_to_binary
 import os
 from collections import defaultdict
+from plots import contexts_number_histogram
 
 
 lock = True
@@ -363,15 +364,18 @@ class preprocessing(object):
         # print('最後版本的vocab是', len(word_count), '個字')
 
         description_dict = self.gen_dict_with_descriptions_as_key(data)
-        for k, v in description_dict.items():
-            if len(v) != 1:
-                print(len(v))
+        
+        # # 畫出Context數量分布histogram
+        # contexts_number_histogram(description_dict)
+        
 
-        # print('==== 開始分train, valid ====')
-        # train, valid, test = self.split_train_valid(data, test_size=.0004, valid_size=.1) # 回傳(train, valid, test)
-        # print('train size', len(train))
-        # print('valid size', len(valid))
-        # print('test size', len(test))
+        print('==== 開始分train, valid ====')
+        train, valid, test = self.split_train_valid(list(description_dict.keys()), test_size=.0004, valid_size=.1) # 回傳(train, valid, test)
+        print('train size', len(train))
+        print('valid size', len(valid))
+        print('test size', len(test))
+
+        print(test)
 
         # print('==== 開始產生vocab和input data ====')
         # ver_num = '7'
