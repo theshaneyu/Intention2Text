@@ -9,6 +9,7 @@ from gen_vocab import gen_vocab
 from sklearn.model_selection import train_test_split
 from data_convert_example import text_to_binary
 import os
+from collections import defaultdict
 
 
 lock = True
@@ -160,7 +161,7 @@ class preprocessing(object):
         return result_list
 
     def remove_duplicate_context(self, data):
-        """刪除重複的context"""
+        """刪除重複的context，作法應該有錯，已廢棄"""
         unique_set = set()
         result_list = []
         for item in data:
@@ -180,7 +181,9 @@ class preprocessing(object):
                 uni_set.add(item_tuple)
             else:    
                 dup_counter += 1
+        print('原本資料總共', len(data), '筆')
         print('總共重複item數目(description對應context為重複之item)：', dup_counter)
+        print('最後版本的資料總共', len(result_list), '筆')
         return result_list
 
     def _gen_item_tuple(self, item):
@@ -298,6 +301,12 @@ class preprocessing(object):
             os.makedirs('../yahoo_knowledge_data/decode/ver_' + ver_num + '/')
             os.makedirs('../yahoo_knowledge_data/decode/ver_' + ver_num + '/dataset_ready/')
 
+    def gen_dict_with_descriptions_as_key(self, data):
+        description_dict = defaultdict(list)
+        for item in data:
+            description_dict[item['description']].append(item['context'])
+        return description_dict
+
     def main(self):
         # with open('../yahoo_knowledge_data/corpus/init_data.json') as rf:
         #     data = json.load(rf)
@@ -337,41 +346,46 @@ class preprocessing(object):
         # 過濾掉description和context皆為相同的item
         data = self.remove_duplicate(data)
 
-        # # 刪除重複context的item
-        # data = self.remove_duplicate_context(data)
-
+        # # sample資料
+        # data = random.sample(data, 1000)
+        
         # # sample東西出來看
         # data = self._sample_data_to_see(data, 100)
         # pprint(data)
 
-        gen = gen_vocab()
-        word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
+        # gen = gen_vocab()
+        # word_count = gen.get_word_count_with_threshold(data, 10) # 用來轉換UNK的counter
 
-        print('==== 開始轉換<UNK> ====')
-        data = self.convert_UNK(word_count, data) # 轉換UNK
+        # print('==== 開始轉換<UNK> ====')
+        # data = self.convert_UNK(word_count, data) # 轉換UNK
 
-        word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
-        print('最後版本的vocab是', len(word_count), '個字')
+        # word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
+        # print('最後版本的vocab是', len(word_count), '個字')
 
-        print('==== 開始分train, valid ====')
-        train, valid, test = self.split_train_valid(data, test_size=.0004, valid_size=.1) # 回傳(train, valid, test)
-        print('train size', len(train))
-        print('valid size', len(valid))
-        print('test size', len(test))
+        description_dict = self.gen_dict_with_descriptions_as_key(data)
+        for k, v in description_dict.items():
+            if len(v) != 1:
+                print(len(v))
 
-        print('==== 開始產生vocab和input data ====')
-        ver_num = '7'
-        # 檢查路徑是否存在
-        self.make_sure_path_exists(ver_num)
-        # 產生vocab，順便產生vocab.tsv
-        gen.gen_final_vocab_and_vocab_tsv(word_count, '../yahoo_knowledge_data/vocab/ver_' + ver_num + '/vocab')
-        # 產生data_convert_example.py可以吃的格式的資料
-        self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_' + ver_num + '/readable_data_ready')
-        self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_' + ver_num + '/readable_data_ready')
-        self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_' + ver_num + '/readable_data_ready')
-        text_to_binary('../yahoo_knowledge_data/train/ver_' + ver_num + '/readable_data_ready', '../yahoo_knowledge_data/train/ver_' + ver_num + '/data')
-        text_to_binary('../yahoo_knowledge_data/valid/ver_' + ver_num + '/readable_data_ready', '../yahoo_knowledge_data/valid/ver_' + ver_num + '/data')
-        self.split_decode_data('../yahoo_knowledge_data/decode/ver_' + ver_num + '/')
+        # print('==== 開始分train, valid ====')
+        # train, valid, test = self.split_train_valid(data, test_size=.0004, valid_size=.1) # 回傳(train, valid, test)
+        # print('train size', len(train))
+        # print('valid size', len(valid))
+        # print('test size', len(test))
+
+        # print('==== 開始產生vocab和input data ====')
+        # ver_num = '7'
+        # # 檢查路徑是否存在
+        # self.make_sure_path_exists(ver_num)
+        # # 產生vocab，順便產生vocab.tsv
+        # gen.gen_final_vocab_and_vocab_tsv(word_count, '../yahoo_knowledge_data/vocab/ver_' + ver_num + '/vocab')
+        # # 產生data_convert_example.py可以吃的格式的資料
+        # self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_' + ver_num + '/readable_data_ready')
+        # self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_' + ver_num + '/readable_data_ready')
+        # self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_' + ver_num + '/readable_data_ready')
+        # text_to_binary('../yahoo_knowledge_data/train/ver_' + ver_num + '/readable_data_ready', '../yahoo_knowledge_data/train/ver_' + ver_num + '/data')
+        # text_to_binary('../yahoo_knowledge_data/valid/ver_' + ver_num + '/readable_data_ready', '../yahoo_knowledge_data/valid/ver_' + ver_num + '/data')
+        # self.split_decode_data('../yahoo_knowledge_data/decode/ver_' + ver_num + '/')
 
 
 if __name__ == '__main__':
