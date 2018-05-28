@@ -144,7 +144,7 @@ class preprocessing(object):
         """加上<p>標籤和<d>標籤"""
         return '<d> <p> ' + paragraph + '</p> </d>'
 
-    def filter_specific_word(self, data):
+    def filter_item_with_specific_words(self, data):
         """專門過濾掉一些含有特定關鍵字的item
         - description當中有「這」的item
         - description或context中含有「貸」的item
@@ -276,7 +276,7 @@ class preprocessing(object):
         except:
             return
 
-    def split_train_valid(self, data, test_size, valid_size):
+    def split_train_valid_test(self, data, test_size, valid_size):
         """
         切割train, valid, test資料
         train先切給test
@@ -355,7 +355,7 @@ class preprocessing(object):
             data = json.load(rf)
         
         # 過濾掉含有特定字串的item
-        data = self.filter_specific_word(data)
+        data = self.filter_item_with_specific_words(data)
         # 過濾掉description和context皆為相同的item
         data = self.remove_duplicate(data)
 
@@ -368,27 +368,27 @@ class preprocessing(object):
         word_count = gen.get_word_count_with_threshold(data, 0) # 這次的word_count有包含UNK
         print('最後版本的vocab是', len(word_count), '個字')
 
-        
-        # 新版保證description在train, valid, test中不重複的切法（依據keys(descriptions去切)）
+        # 新版保證description在train, valid, test中不重複的切法（依據keys(descriptions去切)）#########################
         description_dict = self.gen_dict_with_descriptions_as_key(data)        
         # # 畫出Context數量分布histogram
         # contexts_number_histogram(description_dict)
         print('==== 開始分train, valid ====')
-        train_keys, valid_keys, test_keys = self.split_train_valid(list(description_dict.keys()), test_size=.0004, valid_size=.1)
+        train_keys, valid_keys, test_keys = self.split_train_valid_test(list(description_dict.keys()), test_size=.0004, valid_size=.1)
         train = self.allocate_data_by_description(train_keys, description_dict)
         valid = self.allocate_data_by_description(valid_keys, description_dict)
         test = self.allocate_data_by_description(test_keys, description_dict)
         print('train size', len(train))
         print('valid size', len(valid))
         print('test size', len(test))
+        ##########################################################################################################
 
         print('==== 開始產生vocab和input data ====')
-        ver_num = '7'
+        ver_num = '8'
         # 檢查路徑是否存在
         self.make_sure_path_exists(ver_num)
         # 產生vocab，順便產生vocab.tsv
         gen.gen_final_vocab_and_vocab_tsv(word_count, '../yahoo_knowledge_data/vocab/ver_' + ver_num + '/vocab')
-        # 產生data_convert_example.py可以吃的格式的資料
+        # 產生可以模型吃的資料
         self.gen_input_format(train, '../yahoo_knowledge_data/train/ver_' + ver_num + '/readable_data_ready')
         self.gen_input_format(valid, '../yahoo_knowledge_data/valid/ver_' + ver_num + '/readable_data_ready')
         self.gen_input_format(test, '../yahoo_knowledge_data/decode/ver_' + ver_num + '/readable_data_ready')
