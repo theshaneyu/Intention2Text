@@ -1,44 +1,20 @@
 WORKSPACE
-bazel-bin
-bazel-genfiles
-bazel-out
-bazel-testlogs
-bazel-behavior2text
+bazel-*
 nohup.out
 *.gz
 log_root*
-preprocessing/backup
-preprocessing/corpus
 preprocessing/jieba_dict
 preprocessing/opencc-python/
-preprocessing/vocab
-preprocessing/vocab_before_UNK
-preprocessing/all_vocab
-preprocessing/nohup.out
-preprocessing/*temp*
 preprocessing/*test*
 google_search_crawler/googleresult.json
 google_search_crawler/result.json
 yahoo_knowledge_data/
-yahoo_log_root_1/
-yahoo_log_root_2/
+yahoo_log_root_*/
 google_search_crawler/raw_data.json
 textsum/yahoo_log_root_ver_2/
-seq2seq/log/
 eval_log*
 train_log*
 textsum/log/
-textsum/seq2seq_attention.py
-
-
-
-
-temp*
-data/*
-toy_data/*
-test
-test.json
-jieba_dict/
 
 
 

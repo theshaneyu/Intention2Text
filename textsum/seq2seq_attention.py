@@ -186,7 +186,7 @@ def main(unused_argv):
     hps = seq2seq_attention_model.HParams(
                         mode=FLAGS.mode,  # train, eval, decode
                         min_lr=0.01,  # min learning rate.
-                        lr=.05,  # learning rate
+                        lr=0.15,  # learning rate
                         batch_size=batch_size,
                         enc_layers=2,
                         enc_timesteps=120,
@@ -235,4 +235,3 @@ def main(unused_argv):
 
 if __name__ == '__main__':
     tf.app.run()
-    wf.close()
