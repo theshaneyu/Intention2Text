@@ -222,7 +222,7 @@ def main(unused_argv):
         
         to_build_grapth = True
         while True:
-            kb_input = input('[輸入] ')
+            kb_input = input('> ')
             try:
                 text_to_binary('yahoo_knowledge_data/decode/ver_5/dataset_ready/data_ready_' + kb_input,
                         'yahoo_knowledge_data/decode/decode_data')
