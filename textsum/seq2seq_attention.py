@@ -22,6 +22,8 @@ import os
 
 from tensorflow.contrib.tensorboard.plugins import projector
 from data_convert_example import text_to_binary
+from gen_user_input_for_decoding import preprocessing
+from pprint import pprint
 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '0' # 指定使用某顆GPU跑
@@ -221,13 +223,23 @@ def main(unused_argv):
                 decode_mdl_hps, vocab, num_gpus=FLAGS.num_gpus)
         
         to_build_grapth = True
+        p = preprocessing(FLAGS.vocab_path)
         while True:
             kb_input = input('> ')
-            try:
-                text_to_binary('yahoo_knowledge_data/decode/ver_5/dataset_ready/data_ready_' + kb_input,
-                        'yahoo_knowledge_data/decode/decode_data')
-            except:
-                continue
+            if kb_input == 'c':
+                description_str = input('輸入description > ')
+                context_str = input('輸入context> ')
+                input_data = p.get_data(description=description_str, context=context_str)
+                print('輸入資料：')
+                pprint(input_data)
+            elif kb_input == 'q':
+                break
+            else:
+                try:
+                    text_to_binary('yahoo_knowledge_data/decode/ver_5/dataset_ready/data_ready_' + kb_input,
+                            'yahoo_knowledge_data/decode/decode_data')
+                except:
+                    print('預設testing data出現錯誤')
             decoder = seq2seq_attention_decode.BSDecoder(model, hps, vocab, to_build_grapth)
             to_build_grapth = False
             decoder.DecodeLoop()

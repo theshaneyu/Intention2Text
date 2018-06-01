@@ -15,6 +15,7 @@ textsum/yahoo_log_root_ver_2/
 eval_log*
 train_log*
 textsum/log/
+__init__.py
 
 
 
