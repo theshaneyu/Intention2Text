@@ -247,9 +247,10 @@ def main(unused_argv):
         #     decoder.DecodeLoop()
 
         # 論文用的decode迴圈
-        file_num = 61
+        file_num = 1
         while True:
             if file_num % 60 == 0:
+                print('已經印60筆')
                 break
             try:
                 text_to_binary('yahoo_knowledge_data/decode/ver_5/dataset_ready/data_ready_' + str(file_num),
