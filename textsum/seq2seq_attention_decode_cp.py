@@ -36,19 +36,11 @@ class DecodeIO(object):
             reference: The human (correct) result.
             decode: The machine-generated result
         """
-        # 舊的印結果方式
-        # print('--------------------------------------------------')
-        # print('[輸入的Behavior Context]\n%s\n' % article)
-        # print('[真實人類的Description]\n%s\n' % reference)
-        # print('[機器產生的Description]\n%s\n' % decode)
-        # print('--------------------------------------------------')
-        
-        # 論文用印結果（印在一起）
-        with open('output.txt', 'a') as wf:
-            wf.write('[輸入的Behavior Context]\n%s\n' % article)
-            wf.write('[真實人類的Description]\n%s\n' % reference)
-            wf.write('[機器產生的Description]\n%s\n' % decode)
-            wf.write('--------------------------------------------------\n')
+        print('--------------------------------------------------')
+        print('[輸入的Behavior Context]\n%s\n' % article)
+        print('[真實人類的Description]\n%s\n' % reference)
+        print('[機器產生的Description]\n%s\n' % decode)
+        print('--------------------------------------------------')
 
 
 class BSDecoder(object):

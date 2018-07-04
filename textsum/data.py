@@ -22,6 +22,9 @@ import sys
 
 from tensorflow.core.example import example_pb2
 
+import tensorflow as tf
+FLAGS = tf.app.flags.FLAGS
+
 
 # Special tokens
 PARAGRAPH_START = '<p>'
@@ -106,8 +109,11 @@ def ExampleGen(data_path, num_epochs=None):
                 str_len = struct.unpack('q', len_bytes)[0]
                 example_str = struct.unpack('%ds' % str_len, reader.read(str_len))[0]
                 yield example_pb2.Example.FromString(example_str)
-
+            # decode的時候會開太多檔案
+            if FLAGS.mode == 'decode':
+                reader.close()
         epoch += 1
+    
 
 
 def Pad(ids, pad_id, length):

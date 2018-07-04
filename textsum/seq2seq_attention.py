@@ -221,28 +221,49 @@ def main(unused_argv):
         decode_mdl_hps = hps._replace(dec_timesteps=1)
         model = seq2seq_attention_model.Seq2SeqAttentionModel(
                 decode_mdl_hps, vocab, num_gpus=FLAGS.num_gpus)
-        
+
         to_build_grapth = True
         p = preprocessing(FLAGS.vocab_path)
+        
+        # 舊的decode迴圈
+        # while True:
+        #     kb_input = input('> ')
+        #     if kb_input == 'c':
+        #         description_str = input('輸入description > ')
+        #         context_str = input('輸入context> ')
+        #         input_data = p.get_data(description=description_str, context=context_str)
+        #         print('輸入資料：')
+        #         pprint(input_data)
+        #     elif kb_input == 'q':
+        #         break
+        #     else:
+        #         try:
+        #             text_to_binary('yahoo_knowledge_data/decode/ver_5/dataset_ready/data_ready_' + kb_input,
+        #                     'yahoo_knowledge_data/decode/decode_data')
+        #         except:
+        #             print('預設testing data出現錯誤')
+        #     decoder = seq2seq_attention_decode.BSDecoder(model, hps, vocab, to_build_grapth)
+        #     to_build_grapth = False
+        #     decoder.DecodeLoop()
+
+        # 論文用的decode迴圈
+        file_num = 61
         while True:
-            kb_input = input('> ')
-            if kb_input == 'c':
-                description_str = input('輸入description > ')
-                context_str = input('輸入context> ')
-                input_data = p.get_data(description=description_str, context=context_str)
-                print('輸入資料：')
-                pprint(input_data)
-            elif kb_input == 'q':
+            if file_num % 60 == 0:
                 break
-            else:
-                try:
-                    text_to_binary('yahoo_knowledge_data/decode/ver_5/dataset_ready/data_ready_' + kb_input,
-                            'yahoo_knowledge_data/decode/decode_data')
-                except:
-                    print('預設testing data出現錯誤')
+            try:
+                text_to_binary('yahoo_knowledge_data/decode/ver_5/dataset_ready/data_ready_' + str(file_num),
+                        'yahoo_knowledge_data/decode/decode_data')
+            except:
+                print('預設testing data出現錯誤')
+                break
             decoder = seq2seq_attention_decode.BSDecoder(model, hps, vocab, to_build_grapth)
             to_build_grapth = False
             decoder.DecodeLoop()
+            print('==================', file_num, '==================')
+            file_num += 1
+            
+
 
 
 if __name__ == '__main__':
