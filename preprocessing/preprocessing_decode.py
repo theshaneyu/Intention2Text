@@ -218,25 +218,29 @@ class preprocessing(object):
         data = self.gen_json(
             context='台灣買的到美國牛、澳洲牛，但就是買不到日本牛。 想請問是什麼原因禁止進口日本牛肉？ 還有是從什麼時候開始禁止進口日本牛的？',
             discription='為什麼台灣不能進口日本牛肉？')
-
+        
         out_list = []
         for item in data:
             out_dict = {}
             context = self.go_through_processes_for_context(item['context'])
             discription = self.go_through_processes_for_discription(item['discription'])
+
+            print(context)
+            print(discription)
             if context and discription:
                 out_dict['context'] = context
                 out_dict['discription'] = discription
                 out_list.append(out_dict)
             else:
                 print('無法處理的資料')
-
         data = self.convert_UNK(out_list) # 轉換UNK
-        pprint(data)
+        # pprint(data)
+        
+        
         # 產生data_convert_example.py可以吃的格式的資料
         self.gen_input_format(data, '../yahoo_knowledge_data/decode/data_ready')
         # 產生input可以吃的資料格式
-        text_to_binary('../yahoo_knowledge_data/decode/data_ready', '../yahoo_knowledge_data/decode/data')
+        text_to_binary('../yahoo_knowledge_data/decode/data_ready', '../yahoo_knowledge_data/decode/decode_data')
 
 def split_decode_data():
     file_num = 1
@@ -252,8 +256,8 @@ def split_decode_data():
 
 
 if __name__ == '__main__':
-    # p = preprocessing('../yahoo_knowledge_data/vocab')
-    # p.main()
+    p = preprocessing('../yahoo_knowledge_data/vocab/ver_5/vocab')
+    p.main()
 
-    split_decode_data()
+    # split_decode_data()
 

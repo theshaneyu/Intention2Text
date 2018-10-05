@@ -26,7 +26,7 @@ from gen_user_input_for_decoding import preprocessing
 from pprint import pprint
 
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '0' # 指定使用某顆GPU跑
+os.environ["CUDA_VISIBLE_DEVICES"] = '1' # 指定使用某顆GPU跑
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -190,7 +190,7 @@ def main(unused_argv):
                         min_lr=0.01,  # min learning rate.
                         lr=0.15,  # learning rate
                         batch_size=batch_size,
-                        enc_layers=2,
+                        enc_layers=1,
                         enc_timesteps=120,
                         dec_timesteps=30,
                         min_input_len=2,  # discard articles/summaries < than this

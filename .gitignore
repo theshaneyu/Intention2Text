@@ -1,3 +1,4 @@
+nohup.out
 WORKSPACE
 bazel-*
 nohup.out
@@ -16,6 +17,10 @@ eval_log*
 train_log*
 textsum/log/
 __init__.py
+output.txt
+google_search_crawler/quora_data
+google_search_crawler/questions_40532.txt
+google_search_crawler/new/result_40532.txt
 
 
 
